@@ -1,8 +1,9 @@
 package View;
 
+import View.GameFrame;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class MenuFrame extends JFrame {
     public MenuFrame() {
@@ -28,13 +29,17 @@ public class MenuFrame extends JFrame {
 
         // ACTIONS
         startButton.addActionListener(e -> {
-            // Close menu
+            // Minimize all windows (except this one)
+            for (Window window : Window.getWindows()) {
+                if (window != this && window instanceof JFrame) {
+                    ((JFrame) window).setState(Frame.ICONIFIED);
+                }
+            }
+
+            // Close this menu
             dispose();
 
-            // Minimize all other windows (future improvement)
-            // Stubbed for now
-
-            // Launch game
+            // Launch the game
             new GameFrame();
         });
 
