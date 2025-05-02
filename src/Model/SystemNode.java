@@ -38,4 +38,12 @@ public class SystemNode {
         for (Port port : inputPorts) port.draw(g);
         for (Port port : outputPorts) port.draw(g);
     }
+    public List<Port> getInputPorts() {
+        return inputPorts;
+    }
+
+    public List<Port> getOutputPorts() {
+        return outputPorts;
+    }
+
 }
