@@ -1,27 +1,24 @@
 package View;
 
-import Model.Port;
+import Model.GameModel;
 import Model.SystemNode;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class GamePanel extends JPanel {
-    private final SystemNode testNode;
+    private final GameModel model;
 
     public GamePanel() {
         setBackground(Color.WHITE);
-
-        testNode = new SystemNode(200, 150, 120, 100);
-        testNode.addInputPort(Port.Type.SQUARE);
-        testNode.addInputPort(Port.Type.TRIANGLE);
-        testNode.addOutputPort(Port.Type.SQUARE);
-        testNode.addOutputPort(Port.Type.TRIANGLE);
+        model = new GameModel();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        testNode.draw((Graphics2D) g);
+        for (SystemNode node : model.getSystems()) {
+            node.draw((Graphics2D) g);
+        }
     }
 }
