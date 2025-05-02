@@ -11,6 +11,8 @@ public class WireController {
     private final List<Wire> wires = new ArrayList<>();
     private Port selectedOutput = null;
     private Point currentMouse = null;
+    private Port hoveredPort = null;
+
 
     public void startWire(Port outputPort) {
         this.selectedOutput = outputPort;
@@ -18,9 +20,11 @@ public class WireController {
 
     }
 
-    public void updateMouse(Point point) {
+    public void updateMouse(Point point, Port hovered) {
         this.currentMouse = point;
+        this.hoveredPort = hovered;
     }
+
 
     public void tryConnect(Port inputPort) {
         if (selectedOutput != null && inputPort != null) {
@@ -42,11 +46,15 @@ public class WireController {
         }
 
         if (selectedOutput != null && currentMouse != null) {
-            g.setColor(Color.GRAY);
-            g.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
-                    new float[]{5}, 0));
+            boolean valid = hoveredPort != null &&
+                    hoveredPort.getSide() == Port.Side.LEFT &&
+                    hoveredPort.getType() == selectedOutput.getType();
+
+            g.setColor(valid ? Color.BLUE : Color.RED);
+            g.setStroke(new BasicStroke(1.5f));
             g.drawLine(selectedOutput.getX(), selectedOutput.getY(),
                     currentMouse.x, currentMouse.y);
         }
     }
+
 }

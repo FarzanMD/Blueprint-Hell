@@ -40,13 +40,16 @@ public class MouseController extends MouseAdapter {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        wireController.updateMouse(e.getPoint());
+        wireController.updateMouse(e.getPoint(), findPortAt(e.getPoint()));
+        e.getComponent().repaint();
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        wireController.updateMouse(e.getPoint());
+        wireController.updateMouse(e.getPoint(), findPortAt(e.getPoint()));
+        e.getComponent().repaint();
     }
+
 
     private Port findPortAt(Point point) {
         for (SystemNode node : model.getSystems()) {
