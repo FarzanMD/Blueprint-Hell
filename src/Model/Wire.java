@@ -1,4 +1,5 @@
 package Model;
+
 import java.awt.*;
 
 public class Wire {
@@ -8,14 +9,6 @@ public class Wire {
     public Wire(Port outputPort, Port inputPort) {
         this.outputPort = outputPort;
         this.inputPort = inputPort;
-    }
-
-    public Port getOutputPort() {
-        return outputPort;
-    }
-
-    public Port getInputPort() {
-        return inputPort;
     }
 
     public void draw(Graphics2D g) {

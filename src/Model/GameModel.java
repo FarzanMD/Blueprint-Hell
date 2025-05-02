@@ -7,7 +7,6 @@ public class GameModel {
     private final List<SystemNode> systems = new ArrayList<>();
 
     public GameModel() {
-        // Add some test systems (example)
         SystemNode sys1 = new SystemNode(100, 100, 120, 100);
         sys1.addOutputPort(Port.Type.SQUARE);
         sys1.addOutputPort(Port.Type.TRIANGLE);
@@ -28,4 +27,3 @@ public class GameModel {
         systems.add(system);
     }
 }
-

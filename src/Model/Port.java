@@ -8,7 +8,7 @@ public class Port {
 
     private final Type type;
     private final Side side;
-    private int x, y; //position on screen
+    private int x, y;
 
     public Port(Type type, Side side, int x, int y) {
         this.type = type;
@@ -19,7 +19,6 @@ public class Port {
 
     public Type getType() { return type; }
     public Side getSide() { return side; }
-
     public int getX() { return x; }
     public int getY() { return y; }
 
@@ -33,14 +32,9 @@ public class Port {
             case SQUARE -> g.fillRect(x - 5, y - 5, 10, 10);
             case TRIANGLE -> {
                 int[] xs = {x, x - 6, x + 6};
-//                int[] ys = side == Side.LEFT ? new int[]{y - 6, y + 6, y + 6}
-//                        : new int[]{y + 6, y - 6, y - 6};
-                int[] ys;
-                if (side == Side.LEFT){
-                    ys = new int[]{y - 6, y + 6, y + 6};
-                }else {
-                    ys = new int[]{y + 6, y - 6, y - 6};
-                }
+                int[] ys = side == Side.LEFT
+                        ? new int[]{y - 6, y + 6, y + 6}
+                        : new int[]{y + 6, y - 6, y - 6};
                 g.fillPolygon(xs, ys, 3);
             }
         }

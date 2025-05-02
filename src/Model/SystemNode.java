@@ -18,26 +18,23 @@ public class SystemNode {
 
     public void addInputPort(Port.Type type) {
         int portY = y + 20 + inputPorts.size() * 20;
-        Port port = new Port(type, Port.Side.LEFT, x, portY);
-        inputPorts.add(port);
+        inputPorts.add(new Port(type, Port.Side.LEFT, x, portY));
     }
 
     public void addOutputPort(Port.Type type) {
         int portY = y + 20 + outputPorts.size() * 20;
-        Port port = new Port(type, Port.Side.RIGHT, x + width, portY);
-        outputPorts.add(port);
+        outputPorts.add(new Port(type, Port.Side.RIGHT, x + width, portY));
     }
 
     public void draw(Graphics2D g) {
-        // Draw system rectangle
         g.setColor(Color.LIGHT_GRAY);
         g.fillRect(x, y, width, height);
 
-        // Draw ports
         g.setColor(Color.DARK_GRAY);
         for (Port port : inputPorts) port.draw(g);
         for (Port port : outputPorts) port.draw(g);
     }
+
     public List<Port> getInputPorts() {
         return inputPorts;
     }
@@ -45,5 +42,4 @@ public class SystemNode {
     public List<Port> getOutputPorts() {
         return outputPorts;
     }
-
 }
