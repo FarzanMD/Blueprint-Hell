@@ -1,7 +1,7 @@
-package Controller;
+package controller;
 
-import Model.Port;
-import Model.Wire;
+import model.Port;
+import model.Wire;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -14,6 +14,8 @@ public class WireController {
 
     public void startWire(Port outputPort) {
         this.selectedOutput = outputPort;
+        //System.out.println("Starting wire from: " + outputPort);
+
     }
 
     public void updateMouse(Point point) {
@@ -30,6 +32,8 @@ public class WireController {
         }
         selectedOutput = null;
         currentMouse = null;
+        //System.out.println("Trying to connect: " + selectedOutput + " → " + inputPort);
+
     }
 
     public void draw(Graphics2D g) {

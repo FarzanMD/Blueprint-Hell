@@ -1,9 +1,9 @@
-package Controller;
+package controller;
 
-import Model.GameModel;
-import Model.Port;
-import Model.SystemNode;
-import Controller.WireController;
+import model.GameModel;
+import model.Port;
+import model.SystemNode;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -20,13 +20,22 @@ public class MouseController extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e) {
         Port clicked = findPortAt(e.getPoint());
+//        System.out.println("Mouse pressed at: " + e.getPoint());
+//        System.out.println("Port clicked: " + clicked);
+
         if (clicked != null) {
             if (clicked.getSide() == Port.Side.RIGHT) {
                 wireController.startWire(clicked);
+                Component c = (Component) e.getComponent();
+                c.repaint();
             } else if (clicked.getSide() == Port.Side.LEFT) {
                 wireController.tryConnect(clicked);
+                Component c = (Component) e.getComponent();
+                c.repaint();
+
             }
         }
+
     }
 
     @Override

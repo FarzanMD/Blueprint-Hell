@@ -1,9 +1,9 @@
-package View;
+package view;
 
-import Controller.MouseController;
-import Controller.WireController;
-import Model.GameModel;
-import Model.SystemNode;
+import controller.MouseController;
+import controller.WireController;
+import model.GameModel;
+import model.SystemNode;
 
 import javax.swing.*;
 import java.awt.*;
