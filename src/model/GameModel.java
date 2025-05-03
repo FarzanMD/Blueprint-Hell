@@ -10,6 +10,7 @@ public class GameModel {
         SystemNode sys1 = new SystemNode(100, 100, 120, 100);
         sys1.addOutputPort(Port.Type.SQUARE);
         sys1.addOutputPort(Port.Type.TRIANGLE);
+        sys1.addOutputPort(Port.Type.SQUARE);
 
         SystemNode sys2 = new SystemNode(400, 100, 120, 100);
         sys2.addInputPort(Port.Type.SQUARE);
