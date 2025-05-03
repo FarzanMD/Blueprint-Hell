@@ -3,33 +3,37 @@ package model;
 import java.awt.*;
 
 public class Packet {
-    private Wire wire;
-    private float progress; // 0.0 to 1.0
+    public enum Type { SQUARE, TRIANGLE }
 
-    public Packet(Wire wire) {
-        setWire(wire); // Use setter to handle flags
-        this.progress = 0f;
+    private Wire wire;
+    private Type type;
+    private float progress = 0.0f;
+    private static final float SPEED = 100f; // pixels per second
+
+    public Packet(Wire wire, Type type) {
+        this.wire = wire;
+        this.type = type;
+        if (this.wire != null) {
+            this.wire.setHasPacket(true);
+        }
     }
 
     public void update(float deltaTime) {
-        progress += deltaTime;
-        if (progress >= 1f) {
-            progress = 1f;
+        if (wire == null) return;
+
+        float distance = getDistance();
+        progress += SPEED * deltaTime / distance;
+        if (progress >= 1.0f) {
+            progress = 1.0f;
             if (wire != null) {
-                wire.setHasPacket(false); // Packet has reached end
+                wire.setHasPacket(false);
             }
         }
     }
 
-    public void setWire(Wire newWire) {
-        if (this.wire != null) {
-            this.wire.setHasPacket(false); // Clear old wire
-        }
-        this.wire = newWire;
-        this.progress = 0f;
-        if (newWire != null) {
-            newWire.setHasPacket(true); // Mark new wire
-        }
+
+    public boolean isFinished() {
+        return progress >= 1.0f;
     }
 
     public void draw(Graphics2D g) {
@@ -44,14 +48,53 @@ public class Packet {
         int py = (int) (y1 + (y2 - y1) * progress);
 
         g.setColor(Color.RED);
-        g.fillOval(px - 5, py - 5, 10, 10);
+        switch (type) {
+            case SQUARE -> g.fillRect(px - 5, py - 5, 10, 10);
+            case TRIANGLE -> {
+                int[] xs = {px, px - 6, px + 6};
+                int[] ys = {py - 6, py + 6, py + 6};
+                g.fillPolygon(xs, ys, 3);
+            }
+        }
     }
 
-    public boolean isFinished() {
-        return progress >= 1f;
+    private float getDistance() {
+        if (wire == null) return 1f;
+        int x1 = wire.getOutputPort().getX();
+        int y1 = wire.getOutputPort().getY();
+        int x2 = wire.getInputPort().getX();
+        int y2 = wire.getInputPort().getY();
+        return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    }
+
+    public void setWire(Wire newWire) {
+        if (this.wire != null) {
+            this.wire.setHasPacket(false);
+        }
+        this.wire = newWire;
+        this.progress = 0.0f;
+        if (this.wire != null) {
+            this.wire.setHasPacket(true);
+        }
     }
 
     public Wire getWire() {
         return wire;
+    }
+
+    public float getProgress() {
+        return progress;
+    }
+
+    public void setProgress(float progress) {
+        this.progress = progress;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public Type getType() {
+        return type;
     }
 }
