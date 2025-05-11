@@ -20,6 +20,34 @@ public class WireController {
 
     }
 
+    public List<Wire> getWires() {
+        return wires;
+    }
+
+    public Port getSelectedOutput() {
+        return selectedOutput;
+    }
+
+    public void setSelectedOutput(Port selectedOutput) {
+        this.selectedOutput = selectedOutput;
+    }
+
+    public Point getCurrentMouse() {
+        return currentMouse;
+    }
+
+    public void setCurrentMouse(Point currentMouse) {
+        this.currentMouse = currentMouse;
+    }
+
+    public Port getHoveredPort() {
+        return hoveredPort;
+    }
+
+    public void setHoveredPort(Port hoveredPort) {
+        this.hoveredPort = hoveredPort;
+    }
+
     public void updateMouse(Point point, Port hovered) {
         this.currentMouse = point;
         this.hoveredPort = hovered;
