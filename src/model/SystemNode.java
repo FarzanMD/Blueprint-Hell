@@ -2,7 +2,9 @@ package model;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class SystemNode {
     private int x, y, width, height;
@@ -42,4 +44,22 @@ public class SystemNode {
     public List<Port> getOutputPorts() {
         return outputPorts;
     }
+    public List<Packet> processIncomingPacket(Packet incoming, List<Wire> allWires) {
+        List<Packet> outPackets = new ArrayList<>();
+
+        for (Port outputPort : outputPorts) {
+            // Find wire from this output port
+            for (Wire wire : allWires) {
+                if (wire.getOutputPort() == outputPort && !wire.hasPacket()) {
+                    Queue<Wire> path = new LinkedList<>();
+                    path.add(wire);
+                    outPackets.add(new Packet(Packet.Shape.valueOf(outputPort.getType().name()), path));
+                    wire.setHasPacket(true);
+                    break; // Only one wire per output port
+                }
+            }
+        }
+        return outPackets;
+    }
+
 }

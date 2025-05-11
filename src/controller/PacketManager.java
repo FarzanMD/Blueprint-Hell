@@ -1,6 +1,8 @@
 package controller;
 
 import model.Packet;
+import model.Port;
+import model.SystemNode;
 import model.Wire;
 
 import java.awt.*;
@@ -20,16 +22,34 @@ public class PacketManager {
         }
     }
 
-    public void update(float delta) {
+    public void update(float delta, List<SystemNode> systems, List<Wire> allWires) {
+        List<Packet> newPackets = new ArrayList<>();
+
         Iterator<Packet> iterator = packets.iterator();
         while (iterator.hasNext()) {
             Packet packet = iterator.next();
             packet.advance(delta);
+
             if (packet.isFinished()) {
-                iterator.remove(); // Packet reached end
+                Wire wire = packet.getCurrentWire();
+                if (wire != null) {
+                    Port inputPort = wire.getInputPort();
+
+                    // Find system that owns this input port
+                    for (SystemNode node : systems) {
+                        if (node.getInputPorts().contains(inputPort)) {
+                            newPackets.addAll(node.processIncomingPacket(packet, allWires));
+                            break;
+                        }
+                    }
+                }
+                iterator.remove(); // Remove the original packet
             }
         }
+
+        packets.addAll(newPackets);
     }
+
 
     public void draw(Graphics2D g) {
         for (Packet packet : packets) {

@@ -28,9 +28,10 @@ public class GamePanel extends JPanel {
         addMouseMotionListener(mouseController);
 
         Timer timer = new Timer(16, e -> {
-            packetManager.update(0.01f); // Simulate delta time
+            packetManager.update(0.01f, model.getSystems(), wireController.getWires());
             repaint();
         });
+
         timer.start();
 
         // TEST: spawn a packet every 2 seconds if any wire exists
