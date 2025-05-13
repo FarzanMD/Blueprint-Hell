@@ -48,18 +48,23 @@ public class SystemNode {
         List<Packet> outPackets = new ArrayList<>();
 
         for (Port outputPort : outputPorts) {
-            // Find wire from this output port
             for (Wire wire : allWires) {
                 if (wire.getOutputPort() == outputPort && !wire.hasPacket()) {
                     Queue<Wire> path = new LinkedList<>();
                     path.add(wire);
-                    outPackets.add(new Packet(Packet.Shape.valueOf(outputPort.getType().name()), path));
+
+                    Packet.Shape shape = Packet.Shape.valueOf(outputPort.getType().name());
+                    Packet newPacket = new Packet(shape, path);
                     wire.setHasPacket(true);
+
+                    outPackets.add(newPacket);
                     break; // Only one wire per output port
                 }
             }
         }
+
         return outPackets;
     }
+
 
 }

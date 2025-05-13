@@ -24,8 +24,8 @@ public class PacketManager {
 
     public void update(float delta, List<SystemNode> systems, List<Wire> allWires) {
         List<Packet> newPackets = new ArrayList<>();
-
         Iterator<Packet> iterator = packets.iterator();
+
         while (iterator.hasNext()) {
             Packet packet = iterator.next();
             packet.advance(delta);
@@ -35,19 +35,20 @@ public class PacketManager {
                 if (wire != null) {
                     Port inputPort = wire.getInputPort();
 
-                    // Find system that owns this input port
                     for (SystemNode node : systems) {
                         if (node.getInputPorts().contains(inputPort)) {
-                            newPackets.addAll(node.processIncomingPacket(packet, allWires));
+                            List<Packet> generated = node.processIncomingPacket(packet, allWires);
+                            newPackets.addAll(generated);
                             break;
                         }
                     }
                 }
-                iterator.remove(); // Remove the original packet
+
+                iterator.remove(); // 🚨 REMOVE incoming packet
             }
         }
 
-        packets.addAll(newPackets);
+        packets.addAll(newPackets); // ✅ ADD new split packets
     }
 
 
