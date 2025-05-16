@@ -52,8 +52,9 @@ public class GamePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         for (SystemNode node : model.getSystems()) {
-            node.draw((Graphics2D) g);
+            node.draw((Graphics2D) g, wireController.getWires());
         }
+
         wireController.draw((Graphics2D) g);
         packetManager.draw((Graphics2D) g);
     }

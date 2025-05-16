@@ -28,14 +28,29 @@ public class SystemNode {
         outputPorts.add(new Port(type, Port.Side.RIGHT, x + width, portY));
     }
 
-    public void draw(Graphics2D g) {
+    public void draw(Graphics2D g, List<Wire> wires) {
         g.setColor(Color.LIGHT_GRAY);
         g.fillRect(x, y, width, height);
 
         g.setColor(Color.DARK_GRAY);
         for (Port port : inputPorts) port.draw(g);
         for (Port port : outputPorts) port.draw(g);
+
+        // Valid system indicator (center box)
+        int boxWidth = 40;
+        int boxHeight = 20;
+        int boxX = x + (width - boxWidth) / 2;
+        int boxY = y-30 + (height - boxHeight) / 2;
+
+        if (isFullyConnected(wires)) {
+            g.setColor(Color.BLUE);
+            g.fillRect(boxX, boxY, boxWidth, boxHeight);
+        } else {
+            g.setColor(Color.BLACK);
+            g.drawRect(boxX, boxY, boxWidth, boxHeight);
+        }
     }
+
 
     public List<Port> getInputPorts() {
         return inputPorts;
@@ -78,6 +93,19 @@ public class SystemNode {
         return null; // No free wire
     }
 
+    public boolean isFullyConnected(List<Wire> wires) {
+        for (Port port : inputPorts) {
+            if (wires.stream().noneMatch(w -> w.getInputPort() == port)) {
+                return false;
+            }
+        }
+        for (Port port : outputPorts) {
+            if (wires.stream().noneMatch(w -> w.getOutputPort() == port)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
 }
