@@ -10,6 +10,27 @@ public class SystemNode {
     private int x, y, width, height;
     private final List<Port> inputPorts = new ArrayList<>();
     private final List<Port> outputPorts = new ArrayList<>();
+    private final Queue<Packet> buffer = new LinkedList<>();
+
+    public boolean canAcceptPacket() {
+        return buffer.size() < 5;
+    }
+
+    public void enqueuePacket(Packet p) {
+        buffer.add(p);
+    }
+
+    public void trySendFromQueue(List<Wire> allWires) {
+        if (buffer.isEmpty()) return;
+
+        Wire freeWire = findNextAvailableWire(allWires);
+        if (freeWire != null) {
+            Packet p = buffer.poll();
+            freeWire.setHasPacket(true);
+            p.enterWire(freeWire); // new method in Packet to move into wire
+        }
+    }
+
 
     public SystemNode(int x, int y, int width, int height) {
         this.x = x;

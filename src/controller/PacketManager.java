@@ -34,6 +34,11 @@ public class PacketManager {
                 iterator.remove();
             }
         }
+        // Let systems try to release held packets
+        for (SystemNode node : systems) {
+            node.trySendFromQueue(allWires);
+        }
+
     }
 
     public void draw(Graphics2D g) {

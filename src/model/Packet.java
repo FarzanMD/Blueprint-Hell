@@ -92,12 +92,26 @@ public class Packet {
                         next.setHasPacket(true);
                         currentWire = next;
                         setupWireMotion(next);
+                    } else {
+                        if (node.canAcceptPacket()) {
+                            node.enqueuePacket(this);
+                        }
+                        // Don't continue this packet now — it stops
+                        return;
                     }
                     break;
                 }
             }
+            if (currentWire == null) return; // It's being held
         }
     }
+
+    public void enterWire(Wire wire) {
+        this.currentWire = wire;
+        wire.setHasPacket(true);
+        setupWireMotion(wire);
+    }
+
 
 
     private void setupWireMotion(Wire wire) {
