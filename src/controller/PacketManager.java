@@ -36,8 +36,12 @@ public class PacketManager {
         }
         // Let systems try to release held packets
         for (SystemNode node : systems) {
-            node.trySendFromQueue(allWires);
+            Packet released = node.trySendFromQueue(allWires);
+            if (released != null) {
+                packets.add(released); // 💡 THIS is the missing part
+            }
         }
+
 
     }
 

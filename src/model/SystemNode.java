@@ -20,16 +20,19 @@ public class SystemNode {
         buffer.add(p);
     }
 
-    public void trySendFromQueue(List<Wire> allWires) {
-        if (buffer.isEmpty()) return;
+    public Packet trySendFromQueue(List<Wire> allWires) {
+        if (buffer.isEmpty()) return null;
 
         Wire freeWire = findNextAvailableWire(allWires);
         if (freeWire != null) {
             Packet p = buffer.poll();
-            freeWire.setHasPacket(true);
-            p.enterWire(freeWire); // new method in Packet to move into wire
+            p.enterWire(freeWire);
+            return p;
         }
+
+        return null;
     }
+
 
 
     public SystemNode(int x, int y, int width, int height) {
