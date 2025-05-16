@@ -102,6 +102,30 @@ public class SystemNode {
             g.setColor(Color.BLACK);
             g.drawRect(boxX, boxY, boxWidth, boxHeight);
         }
+
+        // Draw buffered packets
+        int iconSize = 10;
+        int spacing = 5;
+        int startX = x + (width - (iconSize + spacing) * buffer.size()) / 2;
+        int iconY = y - iconSize - 5; // Draw above the system
+
+        int i = 0;
+        for (Packet packet : buffer) {
+            int px = startX + i * (iconSize + spacing);
+            int py = iconY;
+
+            g.setColor(Color.RED);
+            switch (packet.getShape()) {
+                case SQUARE -> g.fillRect(px, py, iconSize, iconSize);
+                case TRIANGLE -> {
+                    int[] xs = {px + iconSize / 2, px, px + iconSize};
+                    int[] ys = {py, py + iconSize, py + iconSize};
+                    g.fillPolygon(xs, ys, 3);
+                }
+            }
+            i++;
+        }
+
     }
 
 
