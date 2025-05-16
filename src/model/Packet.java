@@ -109,8 +109,11 @@ public class Packet {
     public void enterWire(Wire wire) {
         this.currentWire = wire;
         wire.setHasPacket(true);
-        setupWireMotion(wire);
+        this.x = wire.getOutputPort().getX();
+        this.y = wire.getOutputPort().getY();
+        setupWireMotion(wire); // sets vx, vy based on direction
     }
+
 
 
 
