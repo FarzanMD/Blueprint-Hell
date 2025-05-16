@@ -10,20 +10,30 @@ public class Packet {
     private final Shape shape;
     private final Queue<Wire> path = new LinkedList<>();
     private Wire currentWire = null;
-    private float progress = 0f; // Progress along the current wire [0.0, 1.0]
+
+    private float x, y;               // current position
+    private float vx, vy;             // current velocity
+    private float speed;              // current speed in pixels/sec
+    private float acceleration = 0f;  // only used by triangle packets
+    private int hp;                   // health points
+
+    private static final float BASE_SPEED = 100f; // base speed (pixels/sec)
 
     public Packet(Shape shape, Queue<Wire> wirePath) {
         this.shape = shape;
         this.path.addAll(wirePath);
+
+        if (shape == Shape.SQUARE) {
+            hp = 2;
+        } else if (shape == Shape.TRIANGLE) {
+            hp = 3;
+        }
+
         advanceToNextWire();
     }
 
     public Shape getShape() {
         return shape;
-    }
-
-    public float getProgress() {
-        return progress;
     }
 
     public Wire getCurrentWire() {
@@ -34,49 +44,105 @@ public class Packet {
         return currentWire == null;
     }
 
-    public void advance(float delta) {
+    public Point getPosition() {
+        return new Point((int) x, (int) y);
+    }
+
+    public int getHP() {
+        return hp;
+    }
+
+    public void applyHit() {
+        hp--;
+    }
+
+    public void advance(float deltaTime) {
         if (currentWire == null) return;
 
-        progress += delta;
+        speed += acceleration * deltaTime;
+        x += vx * deltaTime;
+        y += vy * deltaTime;
 
-        if (progress >= 1.0f) {
-            // Packet has reached the end of this wire
+        // Check if reached or passed the target
+        int tx = currentWire.getInputPort().getX();
+        int ty = currentWire.getInputPort().getY();
+
+        float dx = tx - x;
+        float dy = ty - y;
+
+        if ((vx * dx <= 0) && (vy * dy <= 0)) {
+            // Snap to exact destination
+            x = tx;
+            y = ty;
+
             currentWire.setHasPacket(false);
             advanceToNextWire();
         }
     }
 
     private void advanceToNextWire() {
-        progress = 0f;
         currentWire = path.poll();
-        if (currentWire != null) {
-            currentWire.setHasPacket(true);
+        if (currentWire == null) return;
+
+        currentWire.setHasPacket(true);
+
+        // Reset position
+        x = currentWire.getOutputPort().getX();
+        y = currentWire.getOutputPort().getY();
+
+        int tx = currentWire.getInputPort().getX();
+        int ty = currentWire.getInputPort().getY();
+
+        float dx = tx - x;
+        float dy = ty - y;
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+        float normX = dx / distance;
+        float normY = dy / distance;
+
+        // Set speed based on rules
+        Port.Type outType = currentWire.getOutputPort().getType();
+        Port.Type inType = currentWire.getInputPort().getType();
+
+        boolean bothSquare = outType == Port.Type.SQUARE && inType == Port.Type.SQUARE;
+        boolean bothTriangle = outType == Port.Type.TRIANGLE && inType == Port.Type.TRIANGLE;
+
+        if (shape == Shape.SQUARE) {
+            if (bothSquare) {
+                speed = BASE_SPEED;
+            } else if (bothTriangle) {
+                speed = BASE_SPEED / 2f;
+            } else {
+                speed = BASE_SPEED; // neutral case
+            }
+            acceleration = 0;
+        } else if (shape == Shape.TRIANGLE) {
+            if (bothTriangle) {
+                speed = BASE_SPEED;
+                acceleration = 0;
+            } else if (bothSquare) {
+                speed = BASE_SPEED * 0.5f; // start slow
+                acceleration = BASE_SPEED * 0.8f; // gains speed quickly
+            } else {
+                speed = BASE_SPEED;
+                acceleration = 0;
+            }
         }
-    }
 
-    public Point getPosition() {
-        if (currentWire == null) return null;
-
-        int x1 = currentWire.getOutputPort().getX();
-        int y1 = currentWire.getOutputPort().getY();
-        int x2 = currentWire.getInputPort().getX();
-        int y2 = currentWire.getInputPort().getY();
-
-        int x = (int) (x1 + (x2 - x1) * progress);
-        int y = (int) (y1 + (y2 - y1) * progress);
-        return new Point(x, y);
+        // Set velocity
+        vx = normX * speed;
+        vy = normY * speed;
     }
 
     public void draw(Graphics2D g) {
-        Point pos = getPosition();
-        if (pos == null) return;
+        if (currentWire == null) return;
 
         g.setColor(Color.RED);
         switch (shape) {
-            case SQUARE -> g.fillRect(pos.x - 5, pos.y - 5, 10, 10);
+            case SQUARE -> g.fillRect((int) x - 5, (int) y - 5, 10, 10);
             case TRIANGLE -> {
-                int[] xs = {pos.x, pos.x - 6, pos.x + 6};
-                int[] ys = {pos.y - 6, pos.y + 6, pos.y + 6};
+                int[] xs = {(int) x, (int) x - 6, (int) x + 6};
+                int[] ys = {(int) y - 6, (int) y + 6, (int) y + 6};
                 g.fillPolygon(xs, ys, 3);
             }
         }
