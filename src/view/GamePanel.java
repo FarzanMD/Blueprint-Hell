@@ -34,13 +34,18 @@ public class GamePanel extends JPanel {
 
         timer.start();
 
-        // TEST: spawn a packet every 2 seconds if any wire exists
+
+        // Real spawning from the first available wire of the start node
         new Timer(2000, e -> {
-            List<Wire> wires = wireController.getWires();
-            if (wires.size() >= 2) {
-                packetManager.spawnPacket(Packet.Shape.SQUARE, List.of(wires.get(0), wires.get(1)));
+            if (model.getSystems().isEmpty()) return;
+
+            SystemNode start = model.getSystems().get(0); // Assume system 0 is the start node
+            Wire wire = start.findNextAvailableWire(wireController.getWires());
+            if (wire != null) {
+                packetManager.spawnPacket(Packet.Shape.SQUARE, wire);
             }
         }).start();
+
     }
 
     @Override

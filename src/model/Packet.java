@@ -1,69 +1,61 @@
 package model;
 
 import java.awt.*;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
 
 public class Packet {
     public enum Shape { SQUARE, TRIANGLE }
 
     private final Shape shape;
-    private final Queue<Wire> path = new LinkedList<>();
-    private Wire currentWire = null;
+    private Wire currentWire;
 
-    private float x, y;               // current position
-    private float vx, vy;             // current velocity
-    private float speed;              // current speed in pixels/sec
-    private float acceleration = 0f;  // only used by triangle packets
-    private int hp;                   // health points
+    private float x, y;
+    private float vx, vy;
+    private float speed;
+    private float acceleration = 0f;
+    private int hp;
 
-    private static final float BASE_SPEED = 100f; // base speed (pixels/sec)
+    private static final float BASE_SPEED = 100f;
 
-    public Packet(Shape shape, Queue<Wire> wirePath) {
+    public Packet(Shape shape, Wire initialWire) {
         this.shape = shape;
-        this.path.addAll(wirePath);
+        this.currentWire = initialWire;
 
         if (shape == Shape.SQUARE) {
             hp = 2;
-        } else if (shape == Shape.TRIANGLE) {
+        } else {
             hp = 3;
         }
 
-        advanceToNextWire();
+        if (currentWire != null) {
+            currentWire.setHasPacket(true);
+            setupWireMotion(currentWire);
+        }
     }
 
     public Shape getShape() {
         return shape;
     }
 
-    public Wire getCurrentWire() {
-        return currentWire;
-    }
-
     public boolean isFinished() {
         return currentWire == null;
+    }
+
+    public Wire getCurrentWire() {
+        return currentWire;
     }
 
     public Point getPosition() {
         return new Point((int) x, (int) y);
     }
 
-    public int getHP() {
-        return hp;
-    }
-
-    public void applyHit() {
-        hp--;
-    }
-
-    public void advance(float deltaTime) {
+    public void advance(float delta, List<SystemNode> systems, List<Wire> allWires) {
         if (currentWire == null) return;
 
-        speed += acceleration * deltaTime;
-        x += vx * deltaTime;
-        y += vy * deltaTime;
+        speed += acceleration * delta;
+        x += vx * delta;
+        y += vy * delta;
 
-        // Check if reached or passed the target
         int tx = currentWire.getInputPort().getX();
         int ty = currentWire.getInputPort().getY();
 
@@ -71,27 +63,35 @@ public class Packet {
         float dy = ty - y;
 
         if ((vx * dx <= 0) && (vy * dy <= 0)) {
-            // Snap to exact destination
+            // Reached end of current wire
             x = tx;
             y = ty;
-
             currentWire.setHasPacket(false);
-            advanceToNextWire();
+
+            // Determine next wire from connected system
+            Port inputPort = currentWire.getInputPort();
+            currentWire = null;
+
+            for (SystemNode node : systems) {
+                if (node.getInputPorts().contains(inputPort)) {
+                    Wire next = node.findNextAvailableWire(allWires);
+                    if (next != null) {
+                        next.setHasPacket(true);
+                        currentWire = next;
+                        setupWireMotion(next);
+                    }
+                    break;
+                }
+            }
         }
     }
 
-    private void advanceToNextWire() {
-        currentWire = path.poll();
-        if (currentWire == null) return;
+    private void setupWireMotion(Wire wire) {
+        x = wire.getOutputPort().getX();
+        y = wire.getOutputPort().getY();
 
-        currentWire.setHasPacket(true);
-
-        // Reset position
-        x = currentWire.getOutputPort().getX();
-        y = currentWire.getOutputPort().getY();
-
-        int tx = currentWire.getInputPort().getX();
-        int ty = currentWire.getInputPort().getY();
+        int tx = wire.getInputPort().getX();
+        int ty = wire.getInputPort().getY();
 
         float dx = tx - x;
         float dy = ty - y;
@@ -100,36 +100,28 @@ public class Packet {
         float normX = dx / distance;
         float normY = dy / distance;
 
-        // Set speed based on rules
-        Port.Type outType = currentWire.getOutputPort().getType();
-        Port.Type inType = currentWire.getInputPort().getType();
+        Port.Type outType = wire.getOutputPort().getType();
+        Port.Type inType = wire.getInputPort().getType();
 
         boolean bothSquare = outType == Port.Type.SQUARE && inType == Port.Type.SQUARE;
         boolean bothTriangle = outType == Port.Type.TRIANGLE && inType == Port.Type.TRIANGLE;
 
         if (shape == Shape.SQUARE) {
-            if (bothSquare) {
-                speed = BASE_SPEED;
-            } else if (bothTriangle) {
-                speed = BASE_SPEED / 2f;
-            } else {
-                speed = BASE_SPEED; // neutral case
-            }
+            speed = bothSquare ? BASE_SPEED : (bothTriangle ? BASE_SPEED / 2f : BASE_SPEED);
             acceleration = 0;
-        } else if (shape == Shape.TRIANGLE) {
+        } else {
             if (bothTriangle) {
                 speed = BASE_SPEED;
                 acceleration = 0;
             } else if (bothSquare) {
-                speed = BASE_SPEED * 0.5f; // start slow
-                acceleration = BASE_SPEED * 0.8f; // gains speed quickly
+                speed = BASE_SPEED * 0.5f;
+                acceleration = BASE_SPEED * 0.8f;
             } else {
                 speed = BASE_SPEED;
                 acceleration = 0;
             }
         }
 
-        // Set velocity
         vx = normX * speed;
         vy = normY * speed;
     }

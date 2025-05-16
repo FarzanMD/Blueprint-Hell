@@ -44,27 +44,40 @@ public class SystemNode {
     public List<Port> getOutputPorts() {
         return outputPorts;
     }
+    /*
     public List<Packet> processIncomingPacket(Packet incoming, List<Wire> allWires) {
         List<Packet> outPackets = new ArrayList<>();
 
         for (Port outputPort : outputPorts) {
             for (Wire wire : allWires) {
                 if (wire.getOutputPort() == outputPort && !wire.hasPacket()) {
+                    // Only use wires that are not occupied
                     Queue<Wire> path = new LinkedList<>();
                     path.add(wire);
 
                     Packet.Shape shape = Packet.Shape.valueOf(outputPort.getType().name());
                     Packet newPacket = new Packet(shape, path);
-                    wire.setHasPacket(true);
-
                     outPackets.add(newPacket);
-                    break; // Only one wire per output port
+                    wire.setHasPacket(true); // Reserve the wire for this new packet
+                    break; // move to next output port
                 }
             }
         }
 
         return outPackets;
     }
+     */
+    public Wire findNextAvailableWire(List<Wire> allWires) {
+        for (Port outputPort : outputPorts) {
+            for (Wire wire : allWires) {
+                if (wire.getOutputPort() == outputPort && !wire.hasPacket()) {
+                    return wire;
+                }
+            }
+        }
+        return null; // No free wire
+    }
+
 
 
 }
