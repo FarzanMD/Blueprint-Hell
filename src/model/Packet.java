@@ -4,7 +4,7 @@ import java.awt.*;
 import java.util.List;
 
 public class Packet {
-    public enum Shape { SQUARE, TRIANGLE }
+    public enum Shape {SQUARE, TRIANGLE}
 
     private final Shape shape;
     private Wire currentWire;
@@ -53,22 +53,35 @@ public class Packet {
         if (currentWire == null) return;
 
         speed += acceleration * delta;
-        x += vx * delta;
-        y += vy * delta;
 
+        // 🔁 Recalculate direction based on current target port position
         int tx = currentWire.getInputPort().getX();
         int ty = currentWire.getInputPort().getY();
 
         float dx = tx - x;
         float dy = ty - y;
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 0) {
+            float normX = dx / distance;
+            float normY = dy / distance;
+            vx = normX * speed;
+            vy = normY * speed;
+        }
+
+        x += vx * delta;
+        y += vy * delta;
+
+        // ✅ Re-check distance in case we’ve arrived or overshot
+        dx = tx - x;
+        dy = ty - y;
 
         if ((vx * dx <= 0) && (vy * dy <= 0)) {
-            // Reached end of current wire
             x = tx;
             y = ty;
             currentWire.setHasPacket(false);
 
-            // Determine next wire from connected system
+            // Move to next wire if available
             Port inputPort = currentWire.getInputPort();
             currentWire = null;
 
@@ -85,6 +98,7 @@ public class Packet {
             }
         }
     }
+
 
     private void setupWireMotion(Wire wire) {
         x = wire.getOutputPort().getX();

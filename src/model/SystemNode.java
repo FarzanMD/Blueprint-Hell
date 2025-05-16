@@ -18,6 +18,38 @@ public class SystemNode {
         this.height = height;
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
     public void addInputPort(Port.Type type) {
         int portY = y + 20 + inputPorts.size() * 20;
         inputPorts.add(new Port(type, Port.Side.LEFT, x, portY));
@@ -55,6 +87,30 @@ public class SystemNode {
     public List<Port> getInputPorts() {
         return inputPorts;
     }
+
+    public void setPosition(int newX, int newY) {
+        int dx = newX - this.x;
+        int dy = newY - this.y;
+
+        this.x = newX;
+        this.y = newY;
+
+        for (int i = 0; i < inputPorts.size(); i++) {
+            Port port = inputPorts.get(i);
+            port.setPosition(x, y + 20 + i * 20);
+        }
+
+        for (int i = 0; i < outputPorts.size(); i++) {
+            Port port = outputPorts.get(i);
+            port.setPosition(x + width, y + 20 + i * 20);
+        }
+    }
+
+    public boolean contains(Point p) {
+        return new Rectangle(x, y, width, height).contains(p);
+    }
+
+
 
     public List<Port> getOutputPorts() {
         return outputPorts;

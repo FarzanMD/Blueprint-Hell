@@ -11,6 +11,9 @@ import java.awt.event.MouseEvent;
 public class MouseController extends MouseAdapter {
     private final GameModel model;
     private final WireController wireController;
+    private SystemNode draggingNode = null;
+    private Point lastMousePos = null;
+
 
     public MouseController(GameModel model, WireController wireController) {
         this.model = model;
@@ -19,23 +22,26 @@ public class MouseController extends MouseAdapter {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Port clicked = findPortAt(e.getPoint());
-//        System.out.println("Mouse pressed at: " + e.getPoint());
-//        System.out.println("Port clicked: " + clicked);
-
-        if (clicked != null) {
-            if (clicked.getSide() == Port.Side.RIGHT) {
-                wireController.startWire(clicked);
-                Component c = (Component) e.getComponent();
-                c.repaint();
-            } else if (clicked.getSide() == Port.Side.LEFT) {
-                wireController.tryConnect(clicked);
-                Component c = (Component) e.getComponent();
-                c.repaint();
-
+        Point p = e.getPoint();
+        for (SystemNode node : model.getSystems()) {
+            if (node.contains(p)) {
+                draggingNode = node;
+                lastMousePos = p;
+                break;
             }
         }
 
+        // Existing wire logic...
+        Port clicked = findPortAt(p);
+        if (clicked != null) {
+            if (clicked.getSide() == Port.Side.RIGHT) {
+                wireController.startWire(clicked);
+            } else if (clicked.getSide() == Port.Side.LEFT) {
+                wireController.tryConnect(clicked);
+            }
+        }
+
+        e.getComponent().repaint();
     }
 
     @Override
@@ -46,9 +52,22 @@ public class MouseController extends MouseAdapter {
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        if (draggingNode != null && lastMousePos != null) {
+            int dx = e.getX() - lastMousePos.x;
+            int dy = e.getY() - lastMousePos.y;
+            draggingNode.setPosition(draggingNode.getX() + dx, draggingNode.getY() + dy);
+            lastMousePos = e.getPoint();
+            e.getComponent().repaint();
+        }
+
         wireController.updateMouse(e.getPoint(), findPortAt(e.getPoint()));
-        e.getComponent().repaint();
     }
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        draggingNode = null;
+        lastMousePos = null;
+    }
+
 
 
     private Port findPortAt(Point point) {
