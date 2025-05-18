@@ -15,17 +15,14 @@ public class Packet {
     private float acceleration = 0f;
     private int hp;
 
+    private float displacement = 0f;
+    private static final float MAX_DISPLACEMENT = 15f;
     private static final float BASE_SPEED = 100f;
 
     public Packet(Shape shape, Wire initialWire) {
         this.shape = shape;
         this.currentWire = initialWire;
-
-        if (shape == Shape.SQUARE) {
-            hp = 2;
-        } else {
-            hp = 3;
-        }
+        this.hp = shape == Shape.SQUARE ? 2 : 3;
 
         if (currentWire != null) {
             currentWire.setHasPacket(true);
@@ -53,6 +50,26 @@ public class Packet {
         hp--;
     }
 
+    public void applyDisplacement(float amount) {
+        displacement += amount;
+    }
+
+    public float[] getWirePerpendicular() {
+        if (currentWire == null) return new float[]{0, 0};
+
+        int x1 = currentWire.getOutputPort().getX();
+        int y1 = currentWire.getOutputPort().getY();
+        int x2 = currentWire.getInputPort().getX();
+        int y2 = currentWire.getInputPort().getY();
+
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        float len = (float) Math.sqrt(dx * dx + dy * dy);
+        if (len == 0) return new float[]{0, 0};
+
+        return new float[]{-dy / len, dx / len};
+    }
+
     public Point getPosition() {
         return new Point((int) x, (int) y);
     }
@@ -60,9 +77,13 @@ public class Packet {
     public void advance(float delta, List<SystemNode> systems, List<Wire> allWires) {
         if (currentWire == null || hp <= 0) return;
 
+        if (Math.abs(displacement) > MAX_DISPLACEMENT) {
+            hp = 0;
+            return;
+        }
+
         speed += acceleration * delta;
 
-        // Recalculate direction based on live port position
         int tx = currentWire.getInputPort().getX();
         int ty = currentWire.getInputPort().getY();
 
@@ -80,7 +101,6 @@ public class Packet {
         x += vx * delta;
         y += vy * delta;
 
-        // Re-check distance in case we’ve arrived or overshot
         dx = tx - x;
         dy = ty - y;
 
@@ -89,7 +109,6 @@ public class Packet {
             y = ty;
             currentWire.setHasPacket(false);
 
-            // Move to next wire if available
             Port inputPort = currentWire.getInputPort();
             currentWire = null;
 
@@ -104,7 +123,7 @@ public class Packet {
                         if (node.canAcceptPacket()) {
                             node.enqueuePacket(this);
                         }
-                        return; // Packet held
+                        return;
                     }
                     break;
                 }
@@ -165,20 +184,29 @@ public class Packet {
     public void draw(Graphics2D g) {
         if (currentWire == null || hp <= 0) return;
 
-        // Draw body
+        float drawX = x;
+        float drawY = y;
+
+        if (currentWire != null) {
+            float[] perp = getWirePerpendicular();
+            drawX += perp[0] * displacement;
+            drawY += perp[1] * displacement;
+        }
+
         g.setColor(Color.RED);
         switch (shape) {
-            case SQUARE -> g.fillRect((int) x - 5, (int) y - 5, 10, 10);
+            case SQUARE -> g.fillRect((int) drawX - 5, (int) drawY - 5, 10, 10);
             case TRIANGLE -> {
-                int[] xs = {(int) x, (int) x - 6, (int) x + 6};
-                int[] ys = {(int) y - 6, (int) y + 6, (int) y + 6};
+                int[] xs = {(int) drawX, (int) drawX - 6, (int) drawX + 6};
+                int[] ys = {(int) drawY - 6, (int) drawY + 6, (int) drawY + 6};
                 g.fillPolygon(xs, ys, 3);
             }
         }
 
-        // Draw HP text above packet
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.PLAIN, 10));
-        g.drawString(String.valueOf(hp), (int) x - 3, (int) y - 8);
+        g.drawString(String.valueOf(hp), (int) drawX - 3, (int) drawY - 8);
     }
+
+
 }
