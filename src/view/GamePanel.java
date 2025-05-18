@@ -65,7 +65,7 @@ public class GamePanel extends JPanel {
             SystemNode start = systems.get(0);
             Wire wire = start.findNextAvailableWire(wireController.getWires());
             if (wire != null) {
-                packetManager.spawnPacket(Packet.Shape.TRIANGLE, wire);
+                packetManager.spawnPacket(Packet.Shape.SQUARE, wire);
             }
         }).start();
 

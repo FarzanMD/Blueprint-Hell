@@ -47,7 +47,16 @@ public class PacketManager {
         }
 
         // Remove destroyed packets
-        packets.removeIf(p -> p.getHP() <= 0 || p.isFinished());
+        Iterator<Packet> cleanup = packets.iterator();
+        while (cleanup.hasNext()) {
+            Packet p = cleanup.next();
+            if (p.getHP() <= 0 || p.isFinished()) {
+                if (p.getCurrentWire() != null) {
+                    p.getCurrentWire().setHasPacket(false);
+                }
+                cleanup.remove();
+            }
+        }
 
         // Systems try to release held packets
         for (SystemNode node : systems) {
