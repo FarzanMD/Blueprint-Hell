@@ -208,5 +208,27 @@ public class Packet {
         g.drawString(String.valueOf(hp), (int) drawX - 3, (int) drawY - 8);
     }
 
+    public void adjustAlongWire(float distance) {
+        if (currentWire == null) return;
+
+        float[] dir = getWireDirection();
+        x += dir[0] * distance;
+        y += dir[1] * distance;
+    }
+
+    public float[] getWireDirection() {
+        if (currentWire == null) return new float[]{0, 0};
+        int x1 = currentWire.getOutputPort().getX();
+        int y1 = currentWire.getOutputPort().getY();
+        int x2 = currentWire.getInputPort().getX();
+        int y2 = currentWire.getInputPort().getY();
+
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        float len = (float) Math.sqrt(dx * dx + dy * dy);
+        if (len == 0) return new float[]{0, 0};
+
+        return new float[]{dx / len, dy / len};
+    }
 
 }

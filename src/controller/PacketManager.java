@@ -37,7 +37,7 @@ public class PacketManager {
                 Packet p2 = packets.get(j);
                 Point pos2 = p2.getPosition();
 
-                if (pos1 != null && pos2 != null && pos1.distance(pos2) < 12) {
+                if (pos1 != null && pos2 != null && pos1.distance(pos2) < 8) {
                     applyMutualImpact(p1, p2);
                 }
             }
@@ -78,6 +78,7 @@ public class PacketManager {
         float ux = dx / dist;
         float uy = dy / dist;
 
+        // --- Perpendicular vectors for visual displacement ---
         float[] perp1 = p1.getWirePerpendicular();
         float[] perp2 = p2.getWirePerpendicular();
 
@@ -87,17 +88,36 @@ public class PacketManager {
         p1.applyDisplacement(-Math.signum(dot1) * 3f);
         p2.applyDisplacement(-Math.signum(dot2) * 3f);
 
+        // --- Tangent (along-wire) projection to determine which packet is ahead ---
+        float[] dir = p1.getWireDirection(); // Both packets should be on the same wire type
+        float along1 = (pos1.x - p1.getCurrentWire().getOutputPort().getX()) * dir[0] +
+                (pos1.y - p1.getCurrentWire().getOutputPort().getY()) * dir[1];
+
+        float along2 = (pos2.x - p2.getCurrentWire().getOutputPort().getX()) * dir[0] +
+                (pos2.y - p2.getCurrentWire().getOutputPort().getY()) * dir[1];
+
+        float pushAmount = 10f;
+
+        if (along1 > along2) {
+            p1.adjustAlongWire(+pushAmount);
+            p2.adjustAlongWire(-pushAmount);
+        } else {
+            p1.adjustAlongWire(-pushAmount);
+            p2.adjustAlongWire(+pushAmount);
+        }
+
+        // --- Apply 1 HP damage each ---
         p1.applyHit();
         p2.applyHit();
-
-
     }
+
 
     public void draw(Graphics2D g) {
         for (Packet packet : packets) {
             packet.draw(g);
         }
     }
+
 
     public List<Packet> getPackets() {
         return packets;
