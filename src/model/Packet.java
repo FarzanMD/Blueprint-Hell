@@ -38,11 +38,19 @@ public class Packet {
     }
 
     public boolean isFinished() {
-        return currentWire == null;
+        return currentWire == null || hp <= 0;
     }
 
     public Wire getCurrentWire() {
         return currentWire;
+    }
+
+    public int getHP() {
+        return hp;
+    }
+
+    public void applyHit() {
+        hp--;
     }
 
     public Point getPosition() {
@@ -50,11 +58,11 @@ public class Packet {
     }
 
     public void advance(float delta, List<SystemNode> systems, List<Wire> allWires) {
-        if (currentWire == null) return;
+        if (currentWire == null || hp <= 0) return;
 
         speed += acceleration * delta;
 
-        // 🔁 Recalculate direction based on current target port position
+        // Recalculate direction based on live port position
         int tx = currentWire.getInputPort().getX();
         int ty = currentWire.getInputPort().getY();
 
@@ -72,7 +80,7 @@ public class Packet {
         x += vx * delta;
         y += vy * delta;
 
-        // ✅ Re-check distance in case we’ve arrived or overshot
+        // Re-check distance in case we’ve arrived or overshot
         dx = tx - x;
         dy = ty - y;
 
@@ -96,13 +104,13 @@ public class Packet {
                         if (node.canAcceptPacket()) {
                             node.enqueuePacket(this);
                         }
-                        // Don't continue this packet now — it stops
-                        return;
+                        return; // Packet held
                     }
                     break;
                 }
             }
-            if (currentWire == null) return; // It's being held
+
+            if (currentWire == null) return;
         }
     }
 
@@ -111,11 +119,8 @@ public class Packet {
         wire.setHasPacket(true);
         this.x = wire.getOutputPort().getX();
         this.y = wire.getOutputPort().getY();
-        setupWireMotion(wire); // sets vx, vy based on direction
+        setupWireMotion(wire);
     }
-
-
-
 
     private void setupWireMotion(Wire wire) {
         x = wire.getOutputPort().getX();
@@ -158,8 +163,9 @@ public class Packet {
     }
 
     public void draw(Graphics2D g) {
-        if (currentWire == null) return;
+        if (currentWire == null || hp <= 0) return;
 
+        // Draw body
         g.setColor(Color.RED);
         switch (shape) {
             case SQUARE -> g.fillRect((int) x - 5, (int) y - 5, 10, 10);
@@ -169,5 +175,10 @@ public class Packet {
                 g.fillPolygon(xs, ys, 3);
             }
         }
+
+        // Draw HP text above packet
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.PLAIN, 10));
+        g.drawString(String.valueOf(hp), (int) x - 3, (int) y - 8);
     }
 }

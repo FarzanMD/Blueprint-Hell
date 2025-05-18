@@ -3,7 +3,6 @@ package controller;
 import model.Packet;
 import model.SystemNode;
 import model.Wire;
-import model.Port;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -29,20 +28,34 @@ public class PacketManager {
         while (iterator.hasNext()) {
             Packet packet = iterator.next();
             packet.advance(deltaTime, systems, allWires);
+        }
 
-            if (packet.isFinished()) {
-                iterator.remove();
+        // Collision detection
+        for (int i = 0; i < packets.size(); i++) {
+            Packet p1 = packets.get(i);
+            Point pos1 = p1.getPosition();
+
+            for (int j = i + 1; j < packets.size(); j++) {
+                Packet p2 = packets.get(j);
+                Point pos2 = p2.getPosition();
+
+                if (pos1 != null && pos2 != null && pos1.distance(pos2) < 12) {
+                    p1.applyHit();
+                    p2.applyHit();
+                }
             }
         }
-        // Let systems try to release held packets
+
+        // Remove destroyed packets
+        packets.removeIf(p -> p.getHP() <= 0 || p.isFinished());
+
+        // Systems try to release held packets
         for (SystemNode node : systems) {
             Packet released = node.trySendFromQueue(allWires);
             if (released != null) {
-                packets.add(released); // 💡 THIS is the missing part
+                packets.add(released);
             }
         }
-
-
     }
 
     public void draw(Graphics2D g) {
