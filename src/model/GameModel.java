@@ -5,6 +5,9 @@ import java.util.List;
 
 public class GameModel {
     private final List<SystemNode> systems = new ArrayList<>();
+    private final CoinManager coinManager = new CoinManager();
+
+
 
     public GameModel() {
         SystemNode sys1 = new SystemNode(100, 100, 120, 100);
@@ -32,5 +35,8 @@ public class GameModel {
 
     public void addSystem(SystemNode system) {
         systems.add(system);
+    }
+    public CoinManager getCoinManager() {
+        return coinManager;
     }
 }

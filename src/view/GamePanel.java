@@ -17,14 +17,28 @@ public class GamePanel extends JPanel {
     private final GameModel model;
     private final WireController wireController;
     private final PacketManager packetManager;
-
     private boolean isRunning = false;
+    private Timer gameTimer;
+
+
+    public void pauseGame() {
+        if (gameTimer != null) {
+            gameTimer.stop();
+        }
+    }
+
+    public void resumeGame() {
+        if (gameTimer != null) {
+            gameTimer.start();
+        }
+    }
+
 
     public GamePanel() {
         setBackground(Color.WHITE);
         model = new GameModel();
         wireController = new WireController();
-        packetManager = new PacketManager();
+        packetManager = new PacketManager(model.getCoinManager());
 
         setFocusable(true);
         requestFocusInWindow();
@@ -47,14 +61,32 @@ public class GamePanel extends JPanel {
                 }
             }
         });
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_S) {
+                    pauseGame(); // you should define this
+                    new ShopWindow(
+                            (JFrame) SwingUtilities.getWindowAncestor(GamePanel.this),
+                            model.getCoinManager().getCoins(),
+                            e1 -> { /* handle Atar */ },
+                            e2 -> { /* handle Airyaman */ },
+                            e3 -> { /* handle Anahita */ }
+                    );
+                    resumeGame(); // resumes after shop closes
+                }
+            }
+        });
+        setFocusable(true);
 
-        Timer timer = new Timer(16, e -> {
+
+        gameTimer = new Timer(16, e -> {
             if (isRunning) {
                 packetManager.update(0.01f, model.getSystems(), wireController.getWires());
             }
             repaint();
         });
-        timer.start();
+        gameTimer.start();
 
         // Packet spawning from start node (only while running)
         new Timer(2000, e -> {
@@ -95,5 +127,10 @@ public class GamePanel extends JPanel {
         // Optional debug display
         g.setColor(Color.BLACK);
         g.drawString("Status: " + (isRunning ? "RUNNING" : "PAUSED"), 10, 20);
+
+        //g.setColor(Color.BLACK);
+        g.setFont(new Font("Noto Emoji", Font.BOLD, 16));
+        g.drawString("\uD83E\uDE99"+":" + model.getCoinManager().getCoins(), 10, 40);
+
     }
 }

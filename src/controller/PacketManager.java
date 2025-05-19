@@ -1,5 +1,6 @@
 package controller;
 
+import model.CoinManager;
 import model.Packet;
 import model.SystemNode;
 import model.Wire;
@@ -11,6 +12,10 @@ import java.util.List;
 
 public class PacketManager {
     private final List<Packet> packets = new ArrayList<>();
+    private final CoinManager coinManager;
+    public PacketManager(CoinManager coinManager) {
+        this.coinManager = coinManager;
+    }
 
     public void addPacket(Packet packet) {
         packets.add(packet);
@@ -26,6 +31,10 @@ public class PacketManager {
     public void update(float deltaTime, List<SystemNode> systems, List<Wire> allWires) {
         for (Packet packet : packets) {
             packet.advance(deltaTime, systems, allWires);
+            if (packet.didJustEnterSystem()) {
+                coinManager.addCoin();        // 💰 earn 1 coin
+                packet.clearJustEnteredFlag();
+            }
         }
 
         // Handle collisions

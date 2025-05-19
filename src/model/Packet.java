@@ -18,6 +18,8 @@ public class Packet {
     private float displacement = 0f;
     private static final float MAX_DISPLACEMENT = 15f;
     private static final float BASE_SPEED = 100f;
+    private boolean justEnteredSystem = false;
+
 
     public Packet(Shape shape, Wire initialWire) {
         this.shape = shape;
@@ -108,6 +110,7 @@ public class Packet {
             x = tx;
             y = ty;
             currentWire.setHasPacket(false);
+            justEnteredSystem = true; // ✅ mark that we just entered a system
 
             Port inputPort = currentWire.getInputPort();
             currentWire = null;
@@ -140,6 +143,15 @@ public class Packet {
         this.y = wire.getOutputPort().getY();
         setupWireMotion(wire);
     }
+
+    public boolean didJustEnterSystem() {
+        return justEnteredSystem;
+    }
+
+    public void clearJustEnteredFlag() {
+        justEnteredSystem = false;
+    }
+
 
     private void setupWireMotion(Wire wire) {
         x = wire.getOutputPort().getX();
