@@ -13,22 +13,20 @@ import java.util.List;
 public class PacketManager {
     private final List<Packet> packets = new ArrayList<>();
     private final CoinManager coinManager;
+
     public PacketManager(CoinManager coinManager) {
         this.coinManager = coinManager;
     }
-
     public void addPacket(Packet packet) {
         packets.add(packet);
     }
-
     public void spawnPacket(Packet.Shape shape, Wire wire) {
         if (wire != null && !wire.hasPacket()) {
             packets.add(new Packet(shape, wire));
             wire.setHasPacket(true);
         }
     }
-
-    public void update(float deltaTime, List<SystemNode> systems, List<Wire> allWires) {
+    public void update(float deltaTime, List<SystemNode> systems, List<Wire> allWires, ShopManager shopManager) {
         for (Packet packet : packets) {
             packet.advance(deltaTime, systems, allWires);
             if (packet.didJustEnterSystem()) {
@@ -38,19 +36,31 @@ public class PacketManager {
         }
 
         // Handle collisions
-        for (int i = 0; i < packets.size(); i++) {
-            Packet p1 = packets.get(i);
-            Point pos1 = p1.getPosition();
+        // if Airyaman is active we have no collision
+        if (!shopManager.isAiryamanActive()) {
+            for (int i = 0; i < packets.size(); i++) {
+                Packet p1 = packets.get(i);
+                Point pos1 = p1.getPosition();
 
-            for (int j = i + 1; j < packets.size(); j++) {
-                Packet p2 = packets.get(j);
-                Point pos2 = p2.getPosition();
+                for (int j = i + 1; j < packets.size(); j++) {
+                    Packet p2 = packets.get(j);
+                    Point pos2 = p2.getPosition();
 
-                if (pos1 != null && pos2 != null && pos1.distance(pos2) < 8) {
-                    applyMutualImpact(p1, p2);
+                    if (pos1 != null && pos2 != null && pos1.distance(pos2) < 8) {
+                        applyMutualImpact(p1, p2);
+                    }
                 }
             }
         }
+
+        //applying Atar
+        if (shopManager.isAtarActive()) {
+            for (Packet p : packets) {
+                p.resetDisplacement(); //TODO
+            }
+        }
+
+
 
         // Remove dead packets and free their wires
         Iterator<Packet> cleanup = packets.iterator();
@@ -72,7 +82,6 @@ public class PacketManager {
             }
         }
     }
-
     private void applyMutualImpact(Packet p1, Packet p2) {
         if (p1.getCurrentWire() == null || p2.getCurrentWire() == null) return;
 
@@ -119,16 +128,18 @@ public class PacketManager {
         p1.applyHit();
         p2.applyHit();
     }
-
-
     public void draw(Graphics2D g) {
         for (Packet packet : packets) {
             packet.draw(g);
         }
     }
-
-
     public List<Packet> getPackets() {
         return packets;
+    }
+    public void restoreAllPacketHP(){
+        for (Packet packet: packets){
+            if (packet.getShape() == Packet.Shape.TRIANGLE){packet.setHp(3);}
+            if (packet.getShape() == Packet.Shape.SQUARE){packet.setHp(2);}
+        }
     }
 }

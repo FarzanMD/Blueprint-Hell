@@ -2,6 +2,7 @@ package view;
 
 import controller.MouseController;
 import controller.PacketManager;
+import controller.ShopManager;
 import controller.WireController;
 import model.GameModel;
 import model.Packet;
@@ -19,6 +20,7 @@ public class GamePanel extends JPanel {
     private final PacketManager packetManager;
     private boolean isRunning = false;
     private Timer gameTimer;
+    private final ShopManager shopManager;
 
 
     public void pauseGame() {
@@ -47,6 +49,9 @@ public class GamePanel extends JPanel {
         addMouseListener(mouseController);
         addMouseMotionListener(mouseController);
 
+
+        shopManager = new ShopManager(model.getCoinManager());
+
         // Spacebar toggles run/pause
         addKeyListener(new KeyAdapter() {
             @Override
@@ -66,12 +71,13 @@ public class GamePanel extends JPanel {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_S) {
                     pauseGame(); // you should define this
+                    int coins = model.getCoinManager().getCoins();
                     new ShopWindow(
                             (JFrame) SwingUtilities.getWindowAncestor(GamePanel.this),
-                            model.getCoinManager().getCoins(),
-                            e1 -> { /* handle Atar */ },
-                            e2 -> { /* handle Airyaman */ },
-                            e3 -> { /* handle Anahita */ }
+                            coins,
+                            e1 -> shopManager.tryBuyAtar(),
+                            e2 -> shopManager.tryBuyAiryaman(),
+                            e3 -> shopManager.tryBuyAnahita(packetManager)
                     );
                     resumeGame(); // resumes after shop closes
                 }
@@ -81,8 +87,9 @@ public class GamePanel extends JPanel {
 
 
         gameTimer = new Timer(16, e -> {
+            shopManager.update();
             if (isRunning) {
-                packetManager.update(0.01f, model.getSystems(), wireController.getWires());
+                packetManager.update(0.01f, model.getSystems(), wireController.getWires(), shopManager);
             }
             repaint();
         });

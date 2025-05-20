@@ -5,20 +5,20 @@ import java.util.List;
 
 public class Packet {
     public enum Shape {SQUARE, TRIANGLE}
-
     private final Shape shape;
     private Wire currentWire;
-
     private float x, y;
     private float vx, vy;
     private float speed;
     private float acceleration = 0f;
     private int hp;
-
     private float displacement = 0f;
     private static final float MAX_DISPLACEMENT = 15f;
     private static final float BASE_SPEED = 100f;
     private boolean justEnteredSystem = false;
+
+
+    //__________________________________________________________________________________________________________________
 
 
     public Packet(Shape shape, Wire initialWire) {
@@ -46,6 +46,10 @@ public class Packet {
 
     public int getHP() {
         return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
     }
 
     public void applyHit() {
@@ -242,5 +246,10 @@ public class Packet {
 
         return new float[]{dx / len, dy / len};
     }
+
+    public void resetDisplacement() {
+        displacement = 0f;
+    }
+
 
 }
