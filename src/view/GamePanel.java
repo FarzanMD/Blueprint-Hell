@@ -71,14 +71,15 @@ public class GamePanel extends JPanel {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_S) {
                     pauseGame(); // you should define this
-                    int coins = model.getCoinManager().getCoins();
+
                     new ShopWindow(
                             (JFrame) SwingUtilities.getWindowAncestor(GamePanel.this),
-                            coins,
+                            () -> model.getCoinManager().getCoins(), // 👈 clean coin supplier
                             e1 -> shopManager.tryBuyAtar(),
                             e2 -> shopManager.tryBuyAiryaman(),
                             e3 -> shopManager.tryBuyAnahita(packetManager)
                     );
+
                     resumeGame(); // resumes after shop closes
                 }
             }
