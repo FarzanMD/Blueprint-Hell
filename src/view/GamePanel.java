@@ -140,5 +140,24 @@ public class GamePanel extends JPanel {
         g.setFont(new Font("Noto Emoji", Font.BOLD, 16));
         g.drawString("\uD83E\uDE99"+":" + model.getCoinManager().getCoins(), 10, 40);
 
+        if (shopManager.isAtarActive()) {
+            g.setColor(Color.ORANGE);
+            g.setFont(new Font("Ariel", Font.BOLD , 16));
+            g.drawString("O' Atar active", 20, 60);
+        }
+        if (shopManager.isAiryamanActive()) {
+            g.setColor(Color.CYAN);
+            g.setFont(new Font("Ariel", Font.BOLD , 16));
+            g.drawString("O' Airyaman active", 20, 80);
+        }
+
+        int used = wireController.getTotalWireLength();
+        int max = 1000;
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Ariel", Font.BOLD , 16));
+        g.drawString("Wire Length: " + used + " / " + max, 120, 20);
+
+
+
     }
 }

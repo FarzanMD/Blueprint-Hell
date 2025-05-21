@@ -7,10 +7,19 @@ public class Wire {
     private final Port inputPort;
     private boolean hasPacket = false;
 
+
     public Wire(Port outputPort, Port inputPort) {
         this.outputPort = outputPort;
-        this.inputPort = inputPort;
+        this.inputPort = inputPort;}
+
+
+    public int getLength() {
+        int dx = inputPort.getX() - outputPort.getX();
+        int dy = inputPort.getY() - outputPort.getY();
+        return (int) Math.sqrt(dx * dx + dy * dy);
     }
+
+
 
     public Port getOutputPort() {
         return outputPort;

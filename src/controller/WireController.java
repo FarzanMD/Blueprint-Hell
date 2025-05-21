@@ -12,6 +12,21 @@ public class WireController {
     private Port selectedOutput = null;
     private Point currentMouse = null;
     private Port hoveredPort = null;
+    private final int MAX_TOTAL_LENGTH = 1000;
+
+
+    public int getTotalWireLength() {
+        return wires.stream().mapToInt(Wire::getLength).sum();
+    }
+
+    private boolean portAlreadyUsed(Port port) {
+        for (Wire wire : wires) {
+            if (wire.getInputPort() == port || wire.getOutputPort() == port) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     public void startWire(Port outputPort) {
@@ -58,13 +73,26 @@ public class WireController {
         if (selectedOutput != null && inputPort != null) {
             if (selectedOutput.getSide() == Port.Side.RIGHT &&
                     inputPort.getSide() == Port.Side.LEFT &&
-                    selectedOutput.getType() == inputPort.getType()) {
-                wires.add(new Wire(selectedOutput, inputPort));
+                    selectedOutput.getType() == inputPort.getType() &&
+                    !portAlreadyUsed(selectedOutput) &&
+                    !portAlreadyUsed(inputPort)) {
+
+                Wire temp = new Wire(selectedOutput, inputPort);
+
+                if (getTotalWireLength() + temp.getLength() <= MAX_TOTAL_LENGTH) {
+                    wires.add(temp);
+                } else {
+                    System.out.println("⚠️ Wire too long: exceeds max network length!");
+                }
+            } else {
+                System.out.println("❌ Invalid connection or port already used.");
             }
         }
+
         selectedOutput = null;
         currentMouse = null;
-        //System.out.println("Trying to connect: " + selectedOutput + " → " + inputPort);
+        hoveredPort = null;
+
 
     }
 
