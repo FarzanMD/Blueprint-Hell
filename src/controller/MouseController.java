@@ -3,7 +3,9 @@ package controller;
 import model.GameModel;
 import model.Port;
 import model.SystemNode;
+import model.Wire;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -40,6 +42,16 @@ public class MouseController extends MouseAdapter {
                 wireController.tryConnect(clicked);
             }
         }
+
+        if (SwingUtilities.isRightMouseButton(e)) {
+            Wire hovered = wireController.findWireNear(e.getPoint());
+            if (hovered != null) {
+                wireController.removeWire(hovered);
+                e.getComponent().repaint();
+            }
+            return;
+        }
+
 
         e.getComponent().repaint();
     }

@@ -27,6 +27,10 @@ public class WireController {
         }
         return false;
     }
+    public void removeWire(Wire wire) {
+        wires.remove(wire);
+    }
+
 
 
     public void startWire(Port outputPort) {
@@ -112,5 +116,34 @@ public class WireController {
                     currentMouse.x, currentMouse.y);
         }
     }
+    public Wire findWireNear(Point p) {
+        for (Wire wire : wires) {
+            Point a = new Point(wire.getOutputPort().getX(), wire.getOutputPort().getY());
+            Point b = new Point(wire.getInputPort().getX(), wire.getInputPort().getY());
+
+            // Check perpendicular distance from point to line segment
+            if (distanceToSegment(p, a, b) < 6) {
+                return wire;
+            }
+        }
+        return null;
+    }
+
+    // Utility
+    private double distanceToSegment(Point p, Point a, Point b) {
+        double dx = b.x - a.x;
+        double dy = b.y - a.y;
+
+        if (dx == 0 && dy == 0) return p.distance(a);
+
+        double t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy);
+        t = Math.max(0, Math.min(1, t));
+
+        double projX = a.x + t * dx;
+        double projY = a.y + t * dy;
+
+        return p.distance(projX, projY);
+    }
+
 
 }
