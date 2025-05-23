@@ -5,12 +5,22 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 public class SystemNode {
     private int x, y, width, height;
     private final List<Port> inputPorts = new ArrayList<>();
     private final List<Port> outputPorts = new ArrayList<>();
     private final Queue<Packet> buffer = new LinkedList<>();
+    public boolean isStartNode = false;
+
+    public boolean isStartNode() {
+        return isStartNode;
+    }
+
+    public void setStartNode(boolean startNode) {
+        isStartNode = startNode;
+    }
 
     public boolean canAcceptPacket() {
         return buffer.size() < 5;
@@ -106,6 +116,13 @@ public class SystemNode {
             g.drawRect(boxX, boxY, boxWidth, boxHeight);
         }
 
+        //locate start node
+        if (isStartNode){
+            g.drawString("Start System" , x+ width/2-30,y+ height/2 +30 );
+
+        }
+
+
         // Draw buffered packets
         int iconSize = 10;
         int spacing = 5;
@@ -128,6 +145,7 @@ public class SystemNode {
             }
             i++;
         }
+
 
     }
 
@@ -211,5 +229,18 @@ public class SystemNode {
         return true;
     }
 
+    /** Return list of input port Types */
+    public List<Port.Type> getInputPortTypes() {
+        return inputPorts.stream()
+                .map(Port::getType)
+                .collect(Collectors.toList());
+    }
+
+    /** Return list of output port Types */
+    public List<Port.Type> getOutputPortTypes() {
+        return outputPorts.stream()
+                .map(Port::getType)
+                .collect(Collectors.toList());
+    }
 
 }

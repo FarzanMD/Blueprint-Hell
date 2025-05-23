@@ -1,32 +1,33 @@
 package model;
 
+import controller.LevelManager;
+import controller.WireController;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameModel {
     private final List<SystemNode> systems = new ArrayList<>();
     private final CoinManager coinManager = new CoinManager();
+    private WireController wireController;
+    private int maxWireLength;
+    private int goalSquare, goalTriangle;
 
 
 
     public GameModel() {
-        SystemNode sys1 = new SystemNode(100, 100, 120, 100);
-        sys1.addOutputPort(Port.Type.SQUARE);
+        // 1) Initialize your WireController
+        this.wireController = new WireController();
 
-
-        SystemNode sys2 = new SystemNode(400, 100, 120, 100);
-        sys2.addInputPort(Port.Type.SQUARE);
-        sys2.addOutputPort(Port.Type.TRIANGLE);
-        sys2.addOutputPort(Port.Type.SQUARE);
-
-        SystemNode sys3 = new SystemNode(700, 100, 120, 100);
-        sys3.addInputPort(Port.Type.SQUARE);
-        sys3.addInputPort(Port.Type.TRIANGLE);
-
-
-        systems.add(sys1);
-        systems.add(sys2);
-        systems.add(sys3);
+        // 2) Load the hard-coded (or JSON) level via LevelManager
+        try {
+            LevelManager lm = new LevelManager(this);
+            lm.loadLevelFromFile("src/level1.json");
+            // → level1.json must live in your working directory
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // Fallback: if load fails, you could set up a default level here
+        }
     }
 
     public List<SystemNode> getSystems() {
@@ -39,4 +40,71 @@ public class GameModel {
     public CoinManager getCoinManager() {
         return coinManager;
     }
+    public void clear() {
+        systems.clear();
+        wireController.clearWires();
+    }
+
+    public WireController getWireController() { return wireController; }
+
+    public void setMaxWireLength(int len) {
+        this.maxWireLength = len;
+        wireController.setMAX_TOTAL_LENGTH(len);
+    }
+
+    public void setPacketGoals(int squares, int triangles) {
+        this.goalSquare = squares;
+        this.goalTriangle = triangles;
+    }
+
+    public List<SystemDefinition> exportSystemDefinitions() {
+        List<SystemDefinition> defs = new ArrayList<>();
+        for (SystemNode n : systems) {
+            defs.add(new SystemDefinition(
+                    n.getX(), n.getY(), n.getWidth(), n.getHeight(),
+                    n.getInputPortTypes(), n.getOutputPortTypes()
+            ));
+        }
+        return defs;
+    }
+
+    // In model/GameModel
+
+    public List<WireDefinition> exportWireDefinitions() {
+        List<WireDefinition> defs = new ArrayList<>();
+        List<SystemNode> syss = getSystems();
+
+        for (Wire wire : wireController.getWires()) {
+            Port out = wire.getOutputPort();
+            Port in  = wire.getInputPort();
+
+            // find the system index and port index for the output
+            int fromSys = -1, fromPortIdx = -1;
+            for (int i = 0; i < syss.size(); i++) {
+                List<Port> outs = syss.get(i).getOutputPorts();
+                if (outs.contains(out)) {
+                    fromSys = i;
+                    fromPortIdx = outs.indexOf(out);
+                    break;
+                }
+            }
+
+            // find the system index and port index for the input
+            int toSys = -1, toPortIdx = -1;
+            for (int i = 0; i < syss.size(); i++) {
+                List<Port> ins = syss.get(i).getInputPorts();
+                if (ins.contains(in)) {
+                    toSys = i;
+                    toPortIdx = ins.indexOf(in);
+                    break;
+                }
+            }
+
+            if (fromSys >= 0 && toSys >= 0) {
+                defs.add(new WireDefinition(fromSys, fromPortIdx, toSys, toPortIdx));
+            }
+        }
+        return defs;
+    }
+
 }

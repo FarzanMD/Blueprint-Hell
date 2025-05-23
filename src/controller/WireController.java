@@ -12,8 +12,11 @@ public class WireController {
     private Port selectedOutput = null;
     private Point currentMouse = null;
     private Port hoveredPort = null;
-    private final int MAX_TOTAL_LENGTH = 1000;
+    private int MAX_TOTAL_LENGTH;
 
+    public void setMAX_TOTAL_LENGTH(int MAX_TOTAL_LENGTH) {
+        this.MAX_TOTAL_LENGTH = MAX_TOTAL_LENGTH;
+    }
 
     public int getTotalWireLength() {
         return wires.stream().mapToInt(Wire::getLength).sum();
@@ -42,6 +45,7 @@ public class WireController {
     public List<Wire> getWires() {
         return wires;
     }
+
 
     public Port getSelectedOutput() {
         return selectedOutput;
@@ -146,4 +150,22 @@ public class WireController {
     }
 
 
+    public void clearWires() {
+        wires.clear();
+    }
+    public boolean tryConnectDirect(Port out, Port in) {
+        if (out.getSide() != Port.Side.RIGHT ||
+                in.getSide()  != Port.Side.LEFT  ||
+                out.getType() != in.getType()   ||
+                portAlreadyUsed(out)            ||
+                portAlreadyUsed(in)) {
+            return false;
+        }
+        Wire w = new Wire(out, in);
+        if (getTotalWireLength() + w.getLength() > getTotalWireLength()) {
+            return false;
+        }
+        wires.add(w);
+        return true;
+    }
 }
