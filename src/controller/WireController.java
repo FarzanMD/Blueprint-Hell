@@ -12,7 +12,12 @@ public class WireController {
     private Port selectedOutput = null;
     private Point currentMouse = null;
     private Port hoveredPort = null;
-    private int MAX_TOTAL_LENGTH;
+    private int MAX_TOTAL_LENGTH = Integer.MAX_VALUE;
+    private LevelManager levelManager;
+
+    public WireController(LevelManager levelManager) {
+        this.levelManager = levelManager;
+    }
 
     public void setMAX_TOTAL_LENGTH(int MAX_TOTAL_LENGTH) {
         this.MAX_TOTAL_LENGTH = MAX_TOTAL_LENGTH;
@@ -153,19 +158,22 @@ public class WireController {
     public void clearWires() {
         wires.clear();
     }
-    public boolean tryConnectDirect(Port out, Port in) {
-        if (out.getSide() != Port.Side.RIGHT ||
-                in.getSide()  != Port.Side.LEFT  ||
-                out.getType() != in.getType()   ||
-                portAlreadyUsed(out)            ||
-                portAlreadyUsed(in)) {
-            return false;
+    public void tryConnectDirect(Port outputPort, Port inputPort) {
+        // Same validation as in tryConnect(...)
+        if (outputPort.getSide() == Port.Side.RIGHT &&
+                inputPort.getSide()  == Port.Side.LEFT  &&
+                outputPort.getType() == inputPort.getType() &&
+                !portAlreadyUsed(outputPort) &&
+                !portAlreadyUsed(inputPort)) {
+
+            Wire wire = new Wire(outputPort, inputPort);
+            if (getTotalWireLength() + wire.getLength() <= MAX_TOTAL_LENGTH) {
+                wires.add(wire);
+            } else {
+                System.out.println("⚠️ Direct wire too long: exceeds max network length!");
+            }
+        } else {
+            System.out.println("❌ Direct wire invalid or port already used.");
         }
-        Wire w = new Wire(out, in);
-        if (getTotalWireLength() + w.getLength() > getTotalWireLength()) {
-            return false;
-        }
-        wires.add(w);
-        return true;
     }
 }

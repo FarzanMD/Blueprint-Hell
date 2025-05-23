@@ -10,24 +10,27 @@ public class GameModel {
     private final List<SystemNode> systems = new ArrayList<>();
     private final CoinManager coinManager = new CoinManager();
     private WireController wireController;
+    private final LevelManager levelManager;
     private int maxWireLength;
     private int goalSquare, goalTriangle;
 
 
 
     public GameModel() {
-        // 1) Initialize your WireController
-        this.wireController = new WireController();
+
 
         // 2) Load the hard-coded (or JSON) level via LevelManager
+       this.levelManager = new LevelManager(this);
+       this.wireController = new WireController(levelManager);
         try {
-            LevelManager lm = new LevelManager(this);
-            lm.loadLevelFromFile("src/level1.json");
+            levelManager.loadLevelFromFile("src/level1.json");
             // → level1.json must live in your working directory
         } catch (Exception ex) {
             ex.printStackTrace();
             // Fallback: if load fails, you could set up a default level here
         }
+
+
     }
 
     public List<SystemNode> getSystems() {
@@ -107,4 +110,7 @@ public class GameModel {
         return defs;
     }
 
+    public void setWireController(WireController wireController) {
+        this.wireController = wireController;
+    }
 }

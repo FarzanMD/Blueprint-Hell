@@ -13,7 +13,8 @@ import java.util.List;
 
 public class LevelManager {
     private final GameModel model;
-    private Level currentLevel;
+    private Level currentLevel ;
+           // loadLevelFromFile("src/level1.json");
 
     public LevelManager(GameModel model) {
         this.model = model;
@@ -94,7 +95,10 @@ public class LevelManager {
             SystemNode from = syss.get(wd.fromSystem);
             SystemNode to   = syss.get(wd.toSystem);
             Port out = from.getOutputPorts().get(wd.fromPortIndex);
-            Port in  = to  .getInputPorts() .get(wd.toPortIndex);
+            Port in  = to  .getInputPorts().get(wd.toPortIndex);
+//            System.out.println(out.getType());
+//            System.out.println(in.getType());
+//            System.out.println(wd.fromSystem + "     " + wd.toSystem);
             wc.tryConnectDirect(out, in);
         }
 

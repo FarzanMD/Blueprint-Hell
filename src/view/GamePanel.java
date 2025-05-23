@@ -1,9 +1,6 @@
 package view;
 
-import controller.MouseController;
-import controller.PacketManager;
-import controller.ShopManager;
-import controller.WireController;
+import controller.*;
 import model.GameModel;
 import model.Packet;
 import model.SystemNode;
@@ -18,6 +15,7 @@ public class GamePanel extends JPanel {
     private final GameModel model;
     private final WireController wireController;
     private final PacketManager packetManager;
+    private final LevelManager levelManager;
     private boolean isRunning = false;
     private Timer gameTimer;
     private final ShopManager shopManager;
@@ -39,7 +37,22 @@ public class GamePanel extends JPanel {
     public GamePanel() {
         setBackground(Color.WHITE);
         model = new GameModel();
-        wireController = new WireController();
+
+
+        levelManager = new LevelManager(model);
+
+        wireController = new WireController(levelManager);
+        model.setWireController(wireController);
+
+        try {
+            levelManager.loadLevelFromFile("src/level1.json");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // optional: show an error dialog
+        }
+
+
+
         packetManager = new PacketManager(model.getCoinManager());
 
         setFocusable(true);
@@ -85,6 +98,33 @@ public class GamePanel extends JPanel {
             }
         });
         setFocusable(true);
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    pauseGame();
+                    int result = JOptionPane.showConfirmDialog(
+                            GamePanel.this,
+                            "Are you sure you want to exit?",
+                            "Exit Confirmation",
+                            JOptionPane.YES_NO_OPTION
+                    );
+                    if (result == JOptionPane.YES_OPTION) {
+                        try {
+                            // Save the game
+                            levelManager.saveStateToFile("src/level1.json");
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        System.exit(0);
+                    } else {
+                        resumeGame();
+                    }
+                }
+            }
+        });
+
 
 
         gameTimer = new Timer(16, e -> {
