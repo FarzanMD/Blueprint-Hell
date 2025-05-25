@@ -12,7 +12,8 @@ public class GameModel {
     private WireController wireController;
     private final LevelManager levelManager;
     private int maxWireLength;
-    private int goalSquare, goalTriangle;
+    private int NumberWillBeSentSquare, NumberWillBeSentTriangle;
+    private int totalPacketsWeWillWend = NumberWillBeSentSquare+NumberWillBeSentTriangle;
 
 
 
@@ -69,8 +70,8 @@ public class GameModel {
     }
 
     public void setPacketGoals(int squares, int triangles) {
-        this.goalSquare = squares;
-        this.goalTriangle = triangles;
+        this.NumberWillBeSentSquare = squares;
+        this.NumberWillBeSentTriangle = triangles;
     }
 
     public List<SystemDefinition> exportSystemDefinitions() {
@@ -125,5 +126,40 @@ public class GameModel {
 
     public void setWireController(WireController wireController) {
         this.wireController = wireController;
+    }
+
+    public SystemNode getStartNode(){
+        return systems.getFirst();
+    }
+
+    public int getMaxWireLength() {
+        return maxWireLength;
+    }
+
+    public int getNumberWillBeSentSquare() {
+        return NumberWillBeSentSquare;
+    }
+
+    public void setNumberWillBeSentSquare(int numberWillBeSentSquare) {
+        NumberWillBeSentSquare = numberWillBeSentSquare;
+    }
+
+    public int getNumberWillBeSentTriangle() {
+        return NumberWillBeSentTriangle;
+    }
+
+    public void setNumberWillBeSentTriangle(int numberWillBeSentTriangle) {
+        NumberWillBeSentTriangle = numberWillBeSentTriangle;
+    }
+
+    public int getTotalPacketsWeWillWend() {
+        return totalPacketsWeWillWend;
+    }
+    public int getBufferedPacketCount() {
+        int total = 0;
+        for (SystemNode s : systems) {
+            total += s.getHeldPacketCount();
+        }
+        return total;
     }
 }

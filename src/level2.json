@@ -1,0 +1,49 @@
+{
+  "wires": [],
+  "squarePacketCount": 10,
+  "systems": [
+    {
+      "inputTypes": ["SQUARE"],
+      "x": 50,
+      "width": 120,
+      "y": 250,
+      "outputTypes": ["SQUARE"],
+      "height": 100
+    },
+    {
+      "inputTypes": ["SQUARE"],
+      "x": 350,
+      "width": 120,
+      "y": 250,
+      "outputTypes": [
+        "SQUARE",
+        "TRIANGLE"
+      ],
+      "height": 100
+    },
+    {
+      "inputTypes": [
+        "SQUARE",
+        "TRIANGLE"
+      ],
+      "x": 650,
+      "width": 120,
+      "y": 250,
+      "outputTypes": ["SQUARE"],
+      "height": 100
+    },
+    {
+      "inputTypes": [
+        "SQUARE",
+        "TRIANGLE"
+      ],
+      "x": 650,
+      "width": 120,
+      "y": 100,
+      "outputTypes": ["SQUARE"],
+      "height": 100
+    }
+  ],
+  "trianglePacketCount": 15,
+  "maxWireLength": 1500
+}

@@ -14,9 +14,6 @@ public class SystemNode {
     private final Queue<Packet> buffer = new LinkedList<>();
     public boolean isStartNode = false;
 
-    public boolean isStartNode() {
-        return isStartNode;
-    }
 
     public void setStartNode(boolean startNode) {
         isStartNode = startNode;
@@ -242,5 +239,11 @@ public class SystemNode {
                 .map(Port::getType)
                 .collect(Collectors.toList());
     }
+    // In SystemNode.java
+    public int getHeldPacketCount() {
+        return buffer.size();  // assuming this is the queue you already use
+    }
+
+
 
 }

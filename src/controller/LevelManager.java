@@ -13,14 +13,16 @@ import java.util.List;
 
 public class LevelManager {
     private final GameModel model;
-    private Level currentLevel ;
-           // loadLevelFromFile("src/save.json");
+    private Level currentLevel;
+    // loadLevelFromFile("src/save.json");
 
     public LevelManager(GameModel model) {
         this.model = model;
     }
 
-    /** Load a level from a JSON file (org.json). */
+    /**
+     * Load a level from a JSON file (org.json).
+     */
     public void loadLevelFromFile(String path) throws Exception {
         try (FileInputStream fis = new FileInputStream(path)) {
             JSONTokener tok = new JSONTokener(fis);
@@ -30,7 +32,9 @@ public class LevelManager {
         }
     }
 
-    /** Parse a JSONObject into a Level. */
+    /**
+     * Parse a JSONObject into a Level.
+     */
     private Level parseLevel(JSONObject o) {
         // systems
         JSONArray sysArr = o.getJSONArray("systems");
@@ -75,27 +79,35 @@ public class LevelManager {
         return new Level(systems, wires, sq, tr, maxLen);
     }
 
-    /** Load a Level into the GameModel. */
+    /**
+     * Load a Level into the GameModel.
+     */
     public void loadLevel(Level lvl) {
         this.currentLevel = lvl;
         model.clear();
         WireController wc = model.getWireController();
 
         // 1) systems
+        boolean first = true;
         for (SystemDefinition sd : lvl.systems) {
             SystemNode node = new SystemNode(sd.x, sd.y, sd.width, sd.height);
-            for (Port.Type t : sd.inputTypes)  node.addInputPort(t);
+            for (Port.Type t : sd.inputTypes) node.addInputPort(t);
             for (Port.Type t : sd.outputTypes) node.addOutputPort(t);
+            if (first) {
+                node.setStartNode(true);
+                first = false;
+            }
             model.addSystem(node);
+
         }
 
         // 2) wires
         List<SystemNode> syss = model.getSystems();
         for (WireDefinition wd : lvl.wires) {
             SystemNode from = syss.get(wd.fromSystem);
-            SystemNode to   = syss.get(wd.toSystem);
+            SystemNode to = syss.get(wd.toSystem);
             Port out = from.getOutputPorts().get(wd.fromPortIndex);
-            Port in  = to  .getInputPorts().get(wd.toPortIndex);
+            Port in = to.getInputPorts().get(wd.toPortIndex);
 //            System.out.println(out.getType());
 //            System.out.println(in.getType());
 //            System.out.println(wd.fromSystem + "     " + wd.toSystem);
@@ -105,9 +117,12 @@ public class LevelManager {
         // 3) settings
         model.setMaxWireLength(lvl.maxWireLength);
         model.setPacketGoals(lvl.squarePacketCount, lvl.trianglePacketCount);
+
     }
 
-    /** Save the *current* network (systems + wires) back to JSON. */
+    /**
+     * Save the *current* network (systems + wires) back to JSON.
+     */
     public void saveStateToFile(String path) throws Exception {
         JSONObject o = new JSONObject();
 

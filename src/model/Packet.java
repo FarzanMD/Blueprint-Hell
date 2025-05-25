@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Packet {
@@ -16,6 +17,7 @@ public class Packet {
     private static final float MAX_DISPLACEMENT = 15f;
     private static final float BASE_SPEED = 100f;
     private boolean justEnteredSystem = false;
+    private Port lastInputPort;
 
 
     //__________________________________________________________________________________________________________________
@@ -114,6 +116,7 @@ public class Packet {
             x = tx;
             y = ty;
             currentWire.setHasPacket(false);
+            lastInputPort = currentWire.getInputPort();
             justEnteredSystem = true; // ✅ mark that we just entered a system
 
             Port inputPort = currentWire.getInputPort();
@@ -250,6 +253,10 @@ public class Packet {
     public void resetDisplacement() {
         displacement = 0f;
     }
+    public Port getLastInputPort() {
+        return lastInputPort;
+    }
+
 
 
 }

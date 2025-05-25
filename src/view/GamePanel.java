@@ -1,10 +1,7 @@
 package view;
 
 import controller.*;
-import model.GameModel;
-import model.Packet;
-import model.SystemNode;
-import model.Wire;
+import model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,17 +21,21 @@ public class GamePanel extends JPanel {
     public void pauseGame() {
         if (gameTimer != null) {
             gameTimer.stop();
+            MusicPlayer.getInstance().stop();
         }
     }
 
     public void resumeGame() {
         if (gameTimer != null) {
             gameTimer.start();
+            MusicPlayer.getInstance().play();
         }
     }
 
 
     public GamePanel() {
+        MusicPlayer.getInstance().play();
+
         setBackground(Color.WHITE);
         model = new GameModel();
 
@@ -53,7 +54,7 @@ public class GamePanel extends JPanel {
 
 
 
-        packetManager = new PacketManager(model.getCoinManager());
+        packetManager = new PacketManager(model.getCoinManager(),model);
 
         setFocusable(true);
         requestFocusInWindow();
@@ -152,6 +153,9 @@ public class GamePanel extends JPanel {
 
     }
     public GamePanel(String path) {
+        MusicPlayer.getInstance().play();
+
+
         setBackground(Color.WHITE);
         model = new GameModel(path);
 
@@ -170,7 +174,7 @@ public class GamePanel extends JPanel {
 
 
 
-        packetManager = new PacketManager(model.getCoinManager());
+        packetManager = new PacketManager(model.getCoinManager(),model);
 
         setFocusable(true);
         requestFocusInWindow();
