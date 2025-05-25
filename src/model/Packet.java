@@ -18,12 +18,14 @@ public class Packet {
     private static final float BASE_SPEED = 100f;
     private boolean justEnteredSystem = false;
     private Port lastInputPort;
+    private final List<Port> startSystemInputs;
+
 
 
     //__________________________________________________________________________________________________________________
 
 
-    public Packet(Shape shape, Wire initialWire) {
+    public Packet(Shape shape, Wire initialWire,List<Port> startSystemInputs) {
         this.shape = shape;
         this.currentWire = initialWire;
         this.hp = shape == Shape.SQUARE ? 2 : 3;
@@ -32,6 +34,7 @@ public class Packet {
             currentWire.setHasPacket(true);
             setupWireMotion(currentWire);
         }
+        this.startSystemInputs=startSystemInputs;
     }
 
     public Shape getShape() {
@@ -39,7 +42,8 @@ public class Packet {
     }
 
     public boolean isFinished() {
-        return currentWire == null || hp <= 0;
+
+        return currentWire == null || hp <= 0 ||(lastInputPort!=null && startSystemInputs.contains(lastInputPort));
     }
 
     public Wire getCurrentWire() {

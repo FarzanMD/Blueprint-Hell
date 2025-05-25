@@ -1,9 +1,9 @@
 {
   "wires": [{
     "fromPortIndex": 0,
-    "toSystem": 1,
+    "toSystem": 3,
     "toPortIndex": 0,
-    "fromSystem": 0
+    "fromSystem": 1
   }],
   "squarePacketCount": 10,
   "systems": [
@@ -17,9 +17,9 @@
     },
     {
       "inputTypes": ["SQUARE"],
-      "x": 340,
+      "x": 254,
       "width": 120,
-      "y": 391,
+      "y": 121,
       "outputTypes": [
         "SQUARE",
         "TRIANGLE"
@@ -36,8 +36,19 @@
       "y": 250,
       "outputTypes": ["SQUARE"],
       "height": 100
+    },
+    {
+      "inputTypes": [
+        "SQUARE",
+        "TRIANGLE"
+      ],
+      "x": 410,
+      "width": 120,
+      "y": 367,
+      "outputTypes": ["SQUARE"],
+      "height": 100
     }
   ],
   "trianglePacketCount": 15,
-  "maxWireLength": 1100
+  "maxWireLength": 1500
 }

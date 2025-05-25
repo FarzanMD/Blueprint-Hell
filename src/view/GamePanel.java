@@ -176,6 +176,7 @@ public class GamePanel extends JPanel {
 
         packetManager = new PacketManager(model.getCoinManager(),model);
 
+
         setFocusable(true);
         requestFocusInWindow();
 
@@ -263,7 +264,7 @@ public class GamePanel extends JPanel {
             List<SystemNode> systems = model.getSystems();
             if (systems.isEmpty()) return;
 
-            SystemNode start = systems.get(0);
+            SystemNode start = model.getStartNode();
             Wire wire = start.findNextAvailableWire(wireController.getWires());
             if (wire != null) {
                 packetManager.spawnPacket(Packet.Shape.TRIANGLE, wire);
