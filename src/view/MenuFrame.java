@@ -1,9 +1,14 @@
 package view;
 
+import model.MusicPlayer;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class MenuFrame extends JFrame {
+
+
     public MenuFrame() {
         setTitle("Blueprint Hell - Menu");
         setSize(400, 300);
@@ -36,6 +41,42 @@ public class MenuFrame extends JFrame {
         });
 
         exitButton.addActionListener(e -> System.exit(0));
+
+        // inside MenuFrame constructor, replace settingsButton listener:
+
+        settingsButton.addActionListener(e -> {
+
+            new SettingsDialog(
+                    this,
+                    MusicPlayer.getInstance().getVolume(),         // supplier
+                    ev -> {
+                        int vol = ((JSlider)ev.getSource()).getValue();
+                        MusicPlayer.getInstance().setVolume(vol);   // apply change
+                    }
+            );
+        });
+
+
+        levelsButton.addActionListener(e -> {
+            List<String> names = List.of("src/level1.json", "src/level2.json");
+            new LevelSelectDialog(
+                    this,
+                    names,
+                    filename -> {
+                        // reload the game from scratch with chosen level
+                        // e.g.:
+                        dispose();               // close menu
+                        // iconify all windows if needed
+                        // Re-init GameFrame with fresh model+level:
+                        SwingUtilities.invokeLater(() -> {
+                            GameFrame gf = new GameFrame(filename);
+                            gf.setVisible(true);
+                        });
+                    }
+            );
+        });
+
+
         setVisible(true);
     }
 }

@@ -45,7 +45,7 @@ public class GamePanel extends JPanel {
         model.setWireController(wireController);
 
         try {
-            levelManager.loadLevelFromFile("src/level1.json");
+            levelManager.loadLevelFromFile("src/save.json");
         } catch (Exception ex) {
             ex.printStackTrace();
             // optional: show an error dialog
@@ -113,7 +113,124 @@ public class GamePanel extends JPanel {
                     if (result == JOptionPane.YES_OPTION) {
                         try {
                             // Save the game
-                            levelManager.saveStateToFile("src/level1.json");
+                            levelManager.saveStateToFile("src/save.json");
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        System.exit(0);
+                    } else {
+                        resumeGame();
+                    }
+                }
+            }
+        });
+
+
+
+        gameTimer = new Timer(16, e -> {
+            shopManager.update();
+            if (isRunning) {
+                packetManager.update(0.01f, model.getSystems(), wireController.getWires(), shopManager);
+            }
+            repaint();
+        });
+        gameTimer.start();
+
+        // Packet spawning from start node (only while running)
+        new Timer(2000, e -> {
+            if (!isRunning) return;
+            List<SystemNode> systems = model.getSystems();
+            if (systems.isEmpty()) return;
+
+            SystemNode start = systems.get(0);
+            Wire wire = start.findNextAvailableWire(wireController.getWires());
+            if (wire != null) {
+                packetManager.spawnPacket(Packet.Shape.TRIANGLE, wire);
+            }
+        }).start();
+
+
+    }
+    public GamePanel(String path) {
+        setBackground(Color.WHITE);
+        model = new GameModel(path);
+
+
+        levelManager = new LevelManager(model);
+
+        wireController = new WireController(levelManager);
+        model.setWireController(wireController);
+
+        try {
+            levelManager.loadLevelFromFile(path);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // optional: show an error dialog
+        }
+
+
+
+        packetManager = new PacketManager(model.getCoinManager());
+
+        setFocusable(true);
+        requestFocusInWindow();
+
+        MouseController mouseController = new MouseController(model, wireController);
+        addMouseListener(mouseController);
+        addMouseMotionListener(mouseController);
+
+
+        shopManager = new ShopManager(model.getCoinManager());
+
+        // Spacebar toggles run/pause
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    if (allSystemsAreValid()) {
+                        isRunning = !isRunning;
+                        System.out.println("System is now " + (isRunning ? "RUNNING" : "PAUSED"));
+                    } else {
+                        System.out.println("Cannot start — not all systems are valid!");
+                    }
+                }
+            }
+        });
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_S) {
+                    pauseGame(); // you should define this
+
+                    new ShopWindow(
+                            (JFrame) SwingUtilities.getWindowAncestor(GamePanel.this),
+                            () -> model.getCoinManager().getCoins(), // 👈 clean coin supplier
+                            e1 -> shopManager.tryBuyAtar(),
+                            e2 -> shopManager.tryBuyAiryaman(),
+                            e3 -> shopManager.tryBuyAnahita(packetManager)
+                    );
+
+                    resumeGame(); // resumes after shop closes
+                }
+            }
+        });
+        setFocusable(true);
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    pauseGame();
+                    int result = JOptionPane.showConfirmDialog(
+                            GamePanel.this,
+                            "Are you sure you want to exit?",
+                            "Exit Confirmation",
+                            JOptionPane.YES_NO_OPTION
+                    );
+                    if (result == JOptionPane.YES_OPTION) {
+                        try {
+                            // Save the game
+                            levelManager.saveStateToFile("src/save.json");
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
@@ -192,7 +309,7 @@ public class GamePanel extends JPanel {
         }
 
         int used = wireController.getTotalWireLength();
-        int max = 1000;
+        int max = wireController.getMAX_TOTAL_LENGTH();
         g.setColor(Color.BLACK);
         g.setFont(new Font("Ariel", Font.BOLD , 16));
         g.drawString("Wire Length: " + used + " / " + max, 120, 20);
@@ -200,4 +317,5 @@ public class GamePanel extends JPanel {
 
 
     }
+
 }

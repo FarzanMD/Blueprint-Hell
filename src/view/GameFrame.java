@@ -14,4 +14,17 @@ public class GameFrame extends JFrame {
         add(new GamePanel());
         setVisible(true);
     }
+
+    public GameFrame(String path) {
+        setTitle("Blueprint Hell - Game");
+        setUndecorated(true);
+        //setSize(1200,800);
+        setSize(800, 600);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        add(new GamePanel(path));
+        setVisible(true);
+    }
+
+
 }

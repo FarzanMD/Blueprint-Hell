@@ -1,5 +1,10 @@
 {
-  "wires": [],
+  "wires": [{
+    "fromPortIndex": 0,
+    "toSystem": 1,
+    "toPortIndex": 0,
+    "fromSystem": 0
+  }],
   "squarePacketCount": 10,
   "systems": [
     {
@@ -12,9 +17,9 @@
     },
     {
       "inputTypes": ["SQUARE"],
-      "x": 350,
+      "x": 340,
       "width": 120,
-      "y": 250,
+      "y": 391,
       "outputTypes": [
         "SQUARE",
         "TRIANGLE"

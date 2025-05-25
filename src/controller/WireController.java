@@ -23,6 +23,10 @@ public class WireController {
         this.MAX_TOTAL_LENGTH = MAX_TOTAL_LENGTH;
     }
 
+    public int getMAX_TOTAL_LENGTH() {
+        return MAX_TOTAL_LENGTH;
+    }
+
     public int getTotalWireLength() {
         return wires.stream().mapToInt(Wire::getLength).sum();
     }

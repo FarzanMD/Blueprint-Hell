@@ -23,14 +23,27 @@ public class GameModel {
        this.levelManager = new LevelManager(this);
        this.wireController = new WireController(levelManager);
         try {
-            levelManager.loadLevelFromFile("src/level1.json");
-            // → level1.json must live in your working directory
+            levelManager.loadLevelFromFile("src/save.json");
+            // → save.json must live in your working directory
         } catch (Exception ex) {
             ex.printStackTrace();
             // Fallback: if load fails, you could set up a default level here
         }
+    }
+
+    public GameModel(String path) {
 
 
+        // 2) Load the hard-coded (or JSON) level via LevelManager
+       this.levelManager = new LevelManager(this);
+       this.wireController = new WireController(levelManager);
+        try {
+            levelManager.loadLevelFromFile(path);
+            // → save.json must live in your working directory
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // Fallback: if load fails, you could set up a default level here
+        }
     }
 
     public List<SystemNode> getSystems() {

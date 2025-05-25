@@ -14,7 +14,7 @@ import java.util.List;
 public class LevelManager {
     private final GameModel model;
     private Level currentLevel ;
-           // loadLevelFromFile("src/level1.json");
+           // loadLevelFromFile("src/save.json");
 
     public LevelManager(GameModel model) {
         this.model = model;
