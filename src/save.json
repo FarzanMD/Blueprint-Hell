@@ -1,25 +1,39 @@
 {
-  "wires": [{
-    "fromPortIndex": 0,
-    "toSystem": 3,
-    "toPortIndex": 0,
-    "fromSystem": 1
-  }],
+  "wires": [
+    {
+      "fromPortIndex": 0,
+      "toSystem": 1,
+      "toPortIndex": 0,
+      "fromSystem": 0
+    },
+    {
+      "fromPortIndex": 0,
+      "toSystem": 2,
+      "toPortIndex": 0,
+      "fromSystem": 1
+    },
+    {
+      "fromPortIndex": 1,
+      "toSystem": 2,
+      "toPortIndex": 1,
+      "fromSystem": 1
+    }
+  ],
   "squarePacketCount": 10,
   "systems": [
     {
       "inputTypes": ["SQUARE"],
-      "x": 50,
+      "x": 160,
       "width": 120,
-      "y": 250,
+      "y": 149,
       "outputTypes": ["SQUARE"],
       "height": 100
     },
     {
       "inputTypes": ["SQUARE"],
-      "x": 254,
+      "x": 398,
       "width": 120,
-      "y": 121,
+      "y": 264,
       "outputTypes": [
         "SQUARE",
         "TRIANGLE"
@@ -42,9 +56,9 @@
         "SQUARE",
         "TRIANGLE"
       ],
-      "x": 410,
+      "x": 650,
       "width": 120,
-      "y": 367,
+      "y": 100,
       "outputTypes": ["SQUARE"],
       "height": 100
     }

@@ -13,7 +13,7 @@ public class GameModel {
     private final LevelManager levelManager;
     private int maxWireLength;
     private int NumberWillBeSentSquare, NumberWillBeSentTriangle;
-    private int totalPacketsWeWillWend = NumberWillBeSentSquare+NumberWillBeSentTriangle;
+    private int totalPacketsWeWillWend ;
 
 
 
@@ -153,7 +153,7 @@ public class GameModel {
     }
 
     public int getTotalPacketsWeWillWend() {
-        return totalPacketsWeWillWend;
+        return getNumberWillBeSentSquare()+getNumberWillBeSentTriangle();
     }
     public int getBufferedPacketCount() {
         int total = 0;

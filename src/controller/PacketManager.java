@@ -115,8 +115,9 @@ public class PacketManager {
                 packets.add(released);
             }
         }
-
-        checkWinCondition();
+        if (totalSent == model.getTotalPacketsWeWillWend()) {
+            checkWinCondition();
+        }
     }
 
     private void applyMutualImpact(Packet p1, Packet p2) {
@@ -190,12 +191,17 @@ public class PacketManager {
     private void checkWinCondition() {
 
 
-        if (resultDeclared) return;
+        if (resultDeclared) {
+            System.out.println("tamam");
+            return;
+        }
 
 
         //int total = sentSquare + sentTriangle;
 
         int goal = model.getTotalPacketsWeWillWend() / 2;
+        System.out.println(goal);
+
 
         if (healthyReturned > goal) {
             System.out.println("🎉 You Win!");
