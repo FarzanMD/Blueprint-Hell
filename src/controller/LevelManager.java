@@ -169,4 +169,9 @@ public class LevelManager {
             fos.write(o.toString(2).getBytes(StandardCharsets.UTF_8));
         }
     }
+    // inside LevelManager class
+    public GameModel getModel() {
+        return this.model;
+    }
+
 }

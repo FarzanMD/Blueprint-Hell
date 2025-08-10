@@ -17,23 +17,29 @@
       "toSystem": 2,
       "toPortIndex": 1,
       "fromSystem": 1
+    },
+    {
+      "fromPortIndex": 0,
+      "toSystem": 0,
+      "toPortIndex": 0,
+      "fromSystem": 2
     }
   ],
   "squarePacketCount": 10,
   "systems": [
     {
       "inputTypes": ["SQUARE"],
-      "x": 160,
+      "x": 507,
       "width": 120,
-      "y": 149,
+      "y": 306,
       "outputTypes": ["SQUARE"],
       "height": 100
     },
     {
       "inputTypes": ["SQUARE"],
-      "x": 398,
+      "x": 389,
       "width": 120,
-      "y": 264,
+      "y": 124,
       "outputTypes": [
         "SQUARE",
         "TRIANGLE"
@@ -45,24 +51,13 @@
         "SQUARE",
         "TRIANGLE"
       ],
-      "x": 650,
+      "x": 346,
       "width": 120,
-      "y": 250,
-      "outputTypes": ["SQUARE"],
-      "height": 100
-    },
-    {
-      "inputTypes": [
-        "SQUARE",
-        "TRIANGLE"
-      ],
-      "x": 650,
-      "width": 120,
-      "y": 100,
+      "y": 314,
       "outputTypes": ["SQUARE"],
       "height": 100
     }
   ],
   "trianglePacketCount": 15,
-  "maxWireLength": 1500
+  "maxWireLength": 1100
 }

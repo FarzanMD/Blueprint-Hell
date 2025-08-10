@@ -126,6 +126,15 @@ public class GamePanel extends JPanel {
             }
         });
 
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_B) {
+                    wireController.toggleBendMode();
+                }
+            }
+        });
+
 
 
         gameTimer = new Timer(16, e -> {
@@ -312,6 +321,12 @@ public class GamePanel extends JPanel {
             g.setFont(new Font("Ariel", Font.BOLD , 16));
             g.drawString("O' Airyaman active", 20, 80);
         }
+        if (wireController.isBendMode()) {
+            g.setColor(Color.CYAN);
+            g.setFont(new Font("Ariel", Font.BOLD , 16));
+            g.drawString("Bend mode active", 20, 80);
+        }
+
 
         int used = wireController.getTotalWireLength();
         int max = wireController.getMAX_TOTAL_LENGTH();
