@@ -13,16 +13,15 @@ public class GameModel {
     private final LevelManager levelManager;
     private int maxWireLength;
     private int NumberWillBeSentSquare, NumberWillBeSentTriangle;
-    private int totalPacketsWeWillWend ;
-
+    private int totalPacketsWeWillWend;
 
 
     public GameModel() {
 
 
         // 2) Load the hard-coded (or JSON) level via LevelManager
-       this.levelManager = new LevelManager(this);
-       this.wireController = new WireController(levelManager);
+        this.levelManager = new LevelManager(this);
+        this.wireController = new WireController(levelManager);
         try {
             levelManager.loadLevelFromFile("src/save.json");
             // → save.json must live in your working directory
@@ -36,8 +35,8 @@ public class GameModel {
 
 
         // 2) Load the hard-coded (or JSON) level via LevelManager
-       this.levelManager = new LevelManager(this);
-       this.wireController = new WireController(levelManager);
+        this.levelManager = new LevelManager(this);
+        this.wireController = new WireController(levelManager);
         try {
             levelManager.loadLevelFromFile(path);
             // → save.json must live in your working directory
@@ -54,15 +53,19 @@ public class GameModel {
     public void addSystem(SystemNode system) {
         systems.add(system);
     }
+
     public CoinManager getCoinManager() {
         return coinManager;
     }
+
     public void clear() {
         systems.clear();
         wireController.clearWires();
     }
 
-    public WireController getWireController() { return wireController; }
+    public WireController getWireController() {
+        return wireController;
+    }
 
     public void setMaxWireLength(int len) {
         this.maxWireLength = len;
@@ -93,7 +96,7 @@ public class GameModel {
 
         for (Wire wire : wireController.getWires()) {
             Port out = wire.getOutputPort();
-            Port in  = wire.getInputPort();
+            Port in = wire.getInputPort();
 
             // find the system index and port index for the output
             int fromSys = -1, fromPortIdx = -1;
@@ -128,7 +131,7 @@ public class GameModel {
         this.wireController = wireController;
     }
 
-    public SystemNode getStartNode(){
+    public SystemNode getStartNode() {
         return systems.getFirst();
     }
 
@@ -153,8 +156,9 @@ public class GameModel {
     }
 
     public int getTotalPacketsWeWillWend() {
-        return getNumberWillBeSentSquare()+getNumberWillBeSentTriangle();
+        return getNumberWillBeSentSquare() + getNumberWillBeSentTriangle();
     }
+
     public int getBufferedPacketCount() {
         int total = 0;
         for (SystemNode s : systems) {

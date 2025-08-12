@@ -10,14 +10,11 @@ import java.util.List;
 public class PacketManager {
     private final List<Packet> packets = new ArrayList<>();
     private final CoinManager coinManager;
-
     private final GameModel model;
-
     private int sentSquare = 0;
     private int sentTriangle = 0;
     private int totalSent = 0;
     private int healthyReturned = 0;
-
 
     public boolean resultDeclared = false;   // reference to the start system
 
@@ -25,11 +22,9 @@ public class PacketManager {
         this.coinManager = coinManager;
         this.model = model;
     }
-
     public void addPacket(Packet packet) {
         packets.add(packet);
     }
-
     public void spawnPacket(Packet.Shape shape, Wire wire) {
         if (wire != null && !wire.hasPacket()) {
             List<Port> startInputs = model.getStartNode().getInputPorts();
